@@ -1,0 +1,6 @@
+services:
+  app:
+    image: ${IMAGE_NAME}  # Use the image name from the .env file
+    command: python app.py
+    ports:
+      - "5000:5000"

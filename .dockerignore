@@ -1,0 +1,8 @@
+.env
+.venv
+.history
+.gitignore
+.git
+.vscode/
+instance/
+build.bat
