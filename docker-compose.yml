@@ -1,6 +1,9 @@
 services:
   app:
     image: ${IMAGE_NAME}  # Use the image name from the .env file
+    container_name: event-countdown-dev
     command: python app.py
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app

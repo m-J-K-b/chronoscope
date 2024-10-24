@@ -1,54 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upcoming Events</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        /* Style for the table header */
-        th {
-            background-color: #f2f2f2; /* Light grey background */
-            position: sticky; /* Make it sticky */
-            top: 0; /* Stick to the top of the page */
-            z-index: 10; /* Ensure it's above other content */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        h1 {
-            text-align: center;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        .container {
-            margin: 20px;
-            padding-bottom: 10px;
-        }
-        .btn-link {
-            text-decoration: none;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-{% include 'flash_messages.html' %}
+{% block title %}Upcoming Events - Event Countdown{% endblock %}
 
+{% block content %} 
 <h1>Upcoming Events</h1>
 
 <div class="container">
@@ -56,7 +10,6 @@
 </div>
 
 <div class="container">
-    <!-- Form to filter events by calendar feeds -->
     <form method="POST" action="/apply_filter">
         <label for="feed-filter">Filter by calendar feeds:</label><br>
     
@@ -69,21 +22,19 @@
         <button type="submit">Apply Filter</button>
     </form>
     <button class="btn-link">
-        <a class="btn-link" href="/clear_filter">Remove Filter</a>
+        <a class="btn-link" href="/clear_filter">Clear Filter</a>
     </button>
 </div>
 
 <div class="conatiner">
 
-    <!-- Inside the events.html file -->
-<!-- Display events -->
 {% if events %}
 <table>
     <thead>
         <tr>
             <th>Event Name</th>
             <th>Start Date</th>
-            <th>End Date</th>  <!-- Added column for end date -->
+            <th>End Date</th>
             <th>Days Until Start</th>
             <th>Days Until End</th>
             <th>Calendar Feed</th>
@@ -113,6 +64,4 @@
 {% endif %}
 </div>
 
-    
-</body>
-</html>
+{% endblock %}
