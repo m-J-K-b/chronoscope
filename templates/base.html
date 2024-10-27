@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Event Countdown{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/calendar-icon.ico') }}">
 </head>
 <body>
     {% include 'flash_messages.html' %}
@@ -15,6 +16,10 @@
         {% block content %}
         {% endblock %}
     </main>
+
+    <script>
+        fetch('/reprocess_feeds', { method: 'POST' });
+    </script>
     
     <footer>
         <p>&copy; 2024 My Website</p>
