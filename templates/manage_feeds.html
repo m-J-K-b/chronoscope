@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Feeds - Event Countdown{% endblock %}
+
+{% block content %}
+<h1>Manage Calendar Feeds</h1>
+
+<div class="container">
+    <h2>Existing Calendars</h2>
+    
+    <h3>Owned Calendars</h3>
+    <p><strong>Add Calendar</strong></p>
+    <form action="/create_calendar" method="post">
+        <label for="name">Calendar Name</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <button class="btn" type="submit">Create Calendar</button>
+    </form>
+
+    {% if owned_feeds %}
+    <table>
+        <thead>
+            <tr>
+                <th>Feed Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feed in owned_feeds %}
+            <tr>
+                <td>{{ feed.name }}</td>
+                <td>
+                    <form action="/delete_feed/{{ feed.id }}" method="POST" style="display:inline;">
+                        <button type="submit">Remove</button>
+                    </form>
+
+                    <!-- Form to view events -->
+                    <form action="/apply_filter" method="POST" style="display:inline;">
+                        <input type="hidden" name="feed" value="{{ feed.id }}">
+                        <button type="submit">View Events</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No owned calendar added yet.</p>
+    {% endif %}
+</div>
+
+<div class="container">
+    <h3>Imported Feeds</h2>
+    <button class="btn">
+        <a class="btn-link" href="/reprocess_feeds">Reprocess Feeds</a>
+    </button>
+    <p><strong>Import Feed</strong></p>
+
+    <form action="/add_feed" method="POST">
+        <label for="name">Feed Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="url">Feed URL:</label>
+        <input type="url" id="url" name="url" required><br><br>
+
+        <button type="submit">Add Feed</button>
+    </form>
+    {% if imported_feeds %}
+    <table>
+        <thead>
+            <tr>
+                <th>Feed Name</th>
+                <th>Feed URL</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feed in imported_feeds %}
+            <tr>
+                <td>{{ feed.name }}</td>
+                <td><a href="{{ feed.url }}" target="_blank">{{ feed.url
+                        }}</a></td>
+                <td>
+                    <!-- Form to delete a feed -->
+                    <form action="/delete_feed/{{ feed.id }}" method="POST"
+                        style="display:inline;">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No calendar feeds added yet.</p>
+    {% endif %}
+</div>
+
+<div class="container">
+    <a href="/">Go back to events</a>
+</div>
+
+{% endblock %}

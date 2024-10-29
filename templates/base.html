@@ -7,6 +7,9 @@
     <title>{% block title %}Event Countdown{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/calendar-icon.ico') }}">
+    {% block head %}
+    {% endblock %}
+
 </head>
 <body>
     {% include 'flash_messages.html' %}
@@ -18,7 +21,7 @@
     </main>
 
     <script>
-        fetch('/reprocess_feeds', { method: 'POST' });
+        fetch('/reprocess_feeds');
     </script>
     
     <footer>

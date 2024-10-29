@@ -1,0 +1,22 @@
+.CellWithComment {
+    position: relative;
+}
+
+.CellComment {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    border: 1px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid #ddd;
+    border-radius: 3px;
+    padding: 3px;
+    color: black;
+    top: 20px;
+    left: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.CellWithComment:hover span.CellComment {
+    display: block;
+}
