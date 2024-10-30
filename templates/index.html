@@ -1,13 +1,17 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/events.css') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/events.css') }}">
 {% endblock %}
 
 {% block title %}Upcoming Events - Event Countdown{% endblock %}
 
-{% block content %} 
-<h1>Upcoming Events</h1>
+{% block content %}
+
+<div class="container">
+    <h1>Upcoming Events</h1>
+</div>
 
 <div class="container">
     <a href="/manage_feeds">Manage Calendar Feeds</a>
@@ -16,13 +20,14 @@
 <div class="container">
     <form method="POST" action="/apply_filter">
         <label for="feed-filter">Filter by calendar feeds:</label><br>
-    
+
         {% for feed in feeds %}
-        <input type="checkbox" id="feed_{{ feed.id }}" name="feed" value="{{ feed.id }}"
-        {% if feed.id|string in selected_feeds %}checked{% endif %}>
+        <input type="checkbox" id="feed_{{ feed.id }}" name="feed"
+            value="{{ feed.id }}"
+            {% if feed.id|string in selected_feeds %}checked{% endif %}>
         <label for="feed_{{ feed.id }}">{{ feed.name }}</label><br>
         {% endfor %}
-    
+
         <button class="btn" type="submit">Apply Filter</button>
     </form>
     <button class="btn">
@@ -31,81 +36,87 @@
 </div>
 
 <div class="conatiner">
-
-{% if events %}
-<table>
-    <thead>
-        <tr>
-            <th>Event Name</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Calendar Feed</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for event in events %}
-        <tr>
-            <td>{{ event.name }}</td>
-            <td class="CellWithComment">
-                <span class="CellComment">{{ event.start_datetime }}</span>
-                {% if event.days_until_start >= 0%}
+    {% if events %}
+    <table>
+        <thead>
+            <tr>
+                <th>Event Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Calendar Feed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event.name }}</td>
+                <td class="CellWithComment">
+                    <span class="CellComment">{{ event.start_datetime }}</span>
+                    {% if event.days_until_start >= 0%}
                     in {{ event.days_until_start }} days
-                {% else %}
-                    {{ -event.days_until_start }} days ago
-                {% endif %}
-            </td>
-            <td class="CellWithComment">
-                <span class="CellComment">{{ event.end_datetime }}</span>
-                {% if event.days_until_start == event.days_until_end %}
-                    -
-                {% else %}
-                    {% if event.days_until_end >= 0%}
-                        in {{ event.days_until_end }} days
                     {% else %}
-                        {{ event.days_until_end }} days ago
+                    {{ -event.days_until_start }} days ago
                     {% endif %}
-                {% endif %}
-            </td>
-            <td><a href="{{ event.feed.url }}" target="_blank">{{ event.feed.name }}</a></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No events to display.</p>
-{% endif %}
+                </td>
+                <td class="CellWithComment">
+                    <span class="CellComment">{{ event.end_datetime }}</span>
+                    {% if event.days_until_start == event.days_until_end %}
+                    -
+                    {% else %}
+                    {% if event.days_until_end >= 0%}
+                    in {{ event.days_until_end }} days
+                    {% else %}
+                    {{ event.days_until_end }} days ago
+                    {% endif %}
+                    {% endif %}
+                </td>
+                <td><a href="{{ event.feed.url }}" target="_blank">{{
+                        event.feed.name }}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No events to display.</p>
+    {% endif %}
 </div>
 
-<div class="event-card" style="float: right; width: 30%; margin-left: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
-    <h3>Add Event</h3>
-    <form action="/add_event" method="POST">  <!-- Update action to your event addition route -->
-        <div>
-            <label for="event-name">Name</label>
-            <input type="text" id="event-name" name="name" required>
-        </div>
-        <div>
-            <label for="event-start-datetime">Start</label>
-            <input type="datetime-local" id="event-start-datetime" name="start_datetime" required>
-        </div>
-        <div>
-            <label for="event-end-datetime">End</label>
-            <input type="datetime-local" id="event-end-datetime" name="end_datetime" required>
-        </div>
-        <div>
-            <label for="event-description">Description</label>
-            <textarea id="event-description" name="description" rows="4"></textarea>
-        </div>
-        <div>
-            <label for="calendar-id">Calendar</label>
-            <select id="calendar-id" name="calendar_id" required>
-                <option value="">Select a Calendar</option>
-                {% for feed in owned_feeds %}
-                <option value="{{ feed.id }}">{{ feed.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn">Add Event</button>
-    </form>
+<div class="container">
+    <div class="event-card">
+        <h3>Add Event</h3>
+        <form action="/add_event" method="POST">
+            <!-- Update action to your event addition route -->
+            <div>
+                <label for="event-name">Name</label>
+                <input type="text" id="event-name" name="name" required>
+            </div>
+            <div>
+                <label for="event-start-datetime">Start</label>
+                <input type="datetime-local" id="event-start-datetime"
+                    name="start_datetime" required>
+            </div>
+            <div>
+                <label for="event-end-datetime">End</label>
+                <input type="datetime-local" id="event-end-datetime"
+                    name="end_datetime" required>
+            </div>
+            <div>
+                <label for="event-description">Description</label>
+                <textarea id="event-description" name="description"
+                    rows="4"></textarea>
+            </div>
+            <div>
+                <label for="calendar-id">Calendar</label>
+                <select id="calendar-id" name="calendar_id" required>
+                    <option value>Select a Calendar</option>
+                    {% for feed in owned_feeds %}
+                    <option value="{{ feed.id }}">{{ feed.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Add Event</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

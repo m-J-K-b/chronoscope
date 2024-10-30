@@ -3,11 +3,13 @@
 {% block title %}Manage Feeds - Event Countdown{% endblock %}
 
 {% block content %}
-<h1>Manage Calendar Feeds</h1>
+<div class="title">
+    <h1>Manage Calendar Feeds</h1>
+</div>
 
 <div class="container">
     <h2>Existing Calendars</h2>
-    
+
     <h3>Owned Calendars</h3>
     <p><strong>Add Calendar</strong></p>
     <form action="/create_calendar" method="post">
@@ -29,12 +31,14 @@
             <tr>
                 <td>{{ feed.name }}</td>
                 <td>
-                    <form action="/delete_feed/{{ feed.id }}" method="POST" style="display:inline;">
+                    <form action="/delete_feed/{{ feed.id }}" method="POST"
+                        style="display:inline;">
                         <button type="submit">Remove</button>
                     </form>
 
                     <!-- Form to view events -->
-                    <form action="/apply_filter" method="POST" style="display:inline;">
+                    <form action="/apply_filter" method="POST"
+                        style="display:inline;">
                         <input type="hidden" name="feed" value="{{ feed.id }}">
                         <button type="submit">View Events</button>
                     </form>

@@ -1,15 +1,13 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/flash_messages.css') }}">
-
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages">
-        <ul>
+{% if messages %}
+<div class="flash-messages">
+    <ul>
         {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
+        <li class="{{ category }}">{{ message }}</li>
         {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+    </ul>
+</div>
+{% endif %}
 {% endwith %}
 
 <!-- Hidden element to pass flash message data -->
