@@ -16,17 +16,17 @@
 </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         var messages = JSON.parse(document.getElementById('flash-messages-data').textContent);
-        
+
         // Show flash messages
         if (messages.length > 0) {
             // Set a timer to remove the flash message after 5 seconds
-            setTimeout(function() {
+            setTimeout(function () {
                 var flashContainer = document.querySelector('.flash-messages');
                 if (flashContainer) {
                     flashContainer.style.opacity = '0'; // Fade out
-                    setTimeout(function() {
+                    setTimeout(function () {
                         flashContainer.style.display = 'none'; // Remove from document after fading out
                     }, 500); // Wait for the fade-out transition to complete
                 }

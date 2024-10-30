@@ -1,8 +1,8 @@
 import os
 import secrets
-from datetime import date, datetime, timezone
-from operator import methodcaller
+from datetime import date, datetime, timezone, timedelta
 
+from urllib.parse import urlparse, urljoin
 import requests
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
@@ -45,6 +45,28 @@ class Event(db.Model):
     calendar_feed_id = db.Column(
         db.Integer, db.ForeignKey("calendar_feed.id"), nullable=False
     )
+
+    @property
+    def duration(self):
+        """Calculate the duration of the event."""
+        if self.end_datetime:
+            return self.end_datetime - self.start_datetime
+        else:
+            return None
+
+    @property
+    def days_until_start(self):
+        """Calculate days until the event starts."""
+        if self.start_datetime:
+            return (self.start_datetime - datetime.now()).days
+        return None
+
+    @property
+    def days_until_end(self):
+        """Calculate days until the event ends."""
+        if self.end_datetime:
+            return (self.end_datetime - datetime.now()).days
+        return None
 
 
 # Create the database tables
@@ -131,6 +153,8 @@ def process_calendar_feed(feed):
 
 @app.route("/reprocess_feeds")
 def reprocess_feeds():
+    redirect_url = request.args.get("redirect_url", "")
+
     # Fetch IDs of all imported calendar feeds
     imported_feed_ids = (
         CalendarFeed.query.filter_by(owned=False).with_entities(CalendarFeed.id).all()
@@ -151,7 +175,15 @@ def reprocess_feeds():
             flash(f"Feed '{feed.name}' couldn't be processed", "danger")
 
     flash("All feeds have been reprocessed.", "success")
-    return redirect(url_for("manage_feeds"))
+
+    # Sanitize and validate the redirect_url
+    redirect_url = urljoin(request.host_url, redirect_url)  # Combine with base URL
+    parsed_url = urlparse(redirect_url)
+
+    if parsed_url.scheme in ("http", "https") and parsed_url.netloc == request.host:
+        return redirect(redirect_url)
+
+    return redirect(url_for("index"))
 
 
 @app.route("/apply_filter", methods=["POST"])
@@ -263,6 +295,7 @@ def add_event():
 def index():
     selected_feed_ids = session.get("selected_feed_ids", [])
     today = datetime.now()
+    today_date = today.date()
 
     owned_feeds = CalendarFeed.query.filter_by(owned=True).all()
 
@@ -270,20 +303,52 @@ def index():
     events = Event.query.filter(Event.end_datetime > today).order_by(
         Event.start_datetime
     )
+
+    # Filter events based on selected feeds if filters are selected
     if selected_feed_ids:
-        # Filter events based on selected feeds
         events = events.filter(Event.calendar_feed_id.in_(selected_feed_ids))
     events = events.all()
+
+    # Prepare data structure to group events by date
+    events_by_date = {}
+
     for event in events:
-        event.days_until_start = (event.start_datetime - today).days
-        event.days_until_end = (event.end_datetime - today).days
+        # Get the start date for the event
+        start_date = event.start_datetime.date()
+        end_date = event.end_datetime.date()
+
+        # Add events to the dictionary for all days from start to end
+        current_date = start_date
+        while current_date >= today_date and current_date <= end_date - timedelta(
+            days=1
+        ):
+            if current_date not in events_by_date:
+                events_by_date[current_date] = []
+            events_by_date[current_date].append(event)
+            current_date += timedelta(days=1)
+
+    # Sort the dates
+    sorted_dates = sorted(events_by_date.keys())
+
+    # Get upcoming events
+    upcoming_events = [event for event in events if event.days_until_start < 5]
+
+    # Sort upcoming events by days_until_start
+    upcoming_events_sorted = sorted(upcoming_events, key=lambda e: e.days_until_start)
+
+    # Pass data to the template
+    num_upcoming_events = len(upcoming_events)
+    first_upcoming_event = upcoming_events_sorted[0] if upcoming_events_sorted else None
 
     return render_template(
         "index.html",
-        events=events,
+        events_by_date=events_by_date,
+        sorted_dates=sorted_dates,
         feeds=CalendarFeed.query.all(),
         owned_feeds=owned_feeds,
         selected_feeds=selected_feed_ids,
+        num_upcoming_events=num_upcoming_events,
+        first_upcoming_event=first_upcoming_event,
     )
 
 

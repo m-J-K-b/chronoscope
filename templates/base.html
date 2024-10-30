@@ -46,8 +46,8 @@
                     <ul class>
                         <li><a href="/">Home</a></li>
                         <li><a href="/manage_feeds">Manage Feeds</a></li>
-                        <li><a class="btn" href="/"><i
-                                    class="fas fa-user"></i>Button</a></li>
+                        <li><a class="btn" href="/reprocess_feeds?redirect_url=/"><i
+                                    class="fa-solid fa-rotate-right"></i>Reprocess</a></li>
                     </ul>
                 </div>
             </div>
@@ -57,12 +57,14 @@
             {% block content %}{% endblock %}
         </main>
 
+        <footer>
+            <div class="container">
+                <p>&copy; 2024 My Website</p>
+            </div>
+        </footer>
+        
         <script>
         fetch('/reprocess_feeds');
-    </script>
-
-        <footer>
-            <p>&copy; 2024 My Website</p>
-        </footer>
+        </script>
     </body>
 </html>

@@ -3,9 +3,17 @@
 {% block title %}Manage Feeds - Event Countdown{% endblock %}
 
 {% block content %}
-<div class="title">
-    <h1>Manage Calendar Feeds</h1>
-</div>
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-heading text-xxl">Manage Feeds</h1>
+            <p class="hero-text">
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Non magni molestiae neque. Magni aut hic veritatis error provident molestiae autem non facilis laudantium fuga. Perferendis maiores nulla doloremque non officia?
+            </p>
+        </div>
+    </div>
+</section>
+
 
 <div class="container">
     <h2>Existing Calendars</h2>
@@ -54,11 +62,8 @@
 
 <div class="container">
     <h3>Imported Feeds</h2>
-    <button class="btn">
-        <a class="btn-link" href="/reprocess_feeds">Reprocess Feeds</a>
-    </button>
-    <p><strong>Import Feed</strong></p>
-
+    
+    <p><strong>Add Feed</strong></p>
     <form action="/add_feed" method="POST">
         <label for="name">Feed Name:</label>
         <input type="text" id="name" name="name" required><br><br>

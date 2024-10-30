@@ -1,122 +1,172 @@
-{% extends 'base.html' %}
-
-{% block head %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/events.css') }}">
-{% endblock %}
-
-{% block title %}Upcoming Events - Event Countdown{% endblock %}
-
+{% extends 'base.html' %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/index.css') }}"
+/>
+{% endblock %} {% block title %}Upcoming Events - Event Countdown{% endblock %}
 {% block content %}
 
-<div class="container">
-    <h1>Upcoming Events</h1>
-</div>
-
-<div class="container">
-    <a href="/manage_feeds">Manage Calendar Feeds</a>
-</div>
-
-<div class="container">
-    <form method="POST" action="/apply_filter">
-        <label for="feed-filter">Filter by calendar feeds:</label><br>
-
-        {% for feed in feeds %}
-        <input type="checkbox" id="feed_{{ feed.id }}" name="feed"
-            value="{{ feed.id }}"
-            {% if feed.id|string in selected_feeds %}checked{% endif %}>
-        <label for="feed_{{ feed.id }}">{{ feed.name }}</label><br>
-        {% endfor %}
-
-        <button class="btn" type="submit">Apply Filter</button>
-    </form>
-    <button class="btn">
-        <a class="btn-link" href="/clear_filter">Clear Filter</a>
-    </button>
-</div>
-
-<div class="conatiner">
-    {% if events %}
-    <table>
-        <thead>
-            <tr>
-                <th>Event Name</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Calendar Feed</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in events %}
-            <tr>
-                <td>{{ event.name }}</td>
-                <td class="CellWithComment">
-                    <span class="CellComment">{{ event.start_datetime }}</span>
-                    {% if event.days_until_start >= 0%}
-                    in {{ event.days_until_start }} days
-                    {% else %}
-                    {{ -event.days_until_start }} days ago
-                    {% endif %}
-                </td>
-                <td class="CellWithComment">
-                    <span class="CellComment">{{ event.end_datetime }}</span>
-                    {% if event.days_until_start == event.days_until_end %}
-                    -
-                    {% else %}
-                    {% if event.days_until_end >= 0%}
-                    in {{ event.days_until_end }} days
-                    {% else %}
-                    {{ event.days_until_end }} days ago
-                    {% endif %}
-                    {% endif %}
-                </td>
-                <td><a href="{{ event.feed.url }}" target="_blank">{{
-                        event.feed.name }}</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No events to display.</p>
-    {% endif %}
-</div>
-
-<div class="container">
-    <div class="event-card">
-        <h3>Add Event</h3>
-        <form action="/add_event" method="POST">
-            <!-- Update action to your event addition route -->
-            <div>
-                <label for="event-name">Name</label>
-                <input type="text" id="event-name" name="name" required>
-            </div>
-            <div>
-                <label for="event-start-datetime">Start</label>
-                <input type="datetime-local" id="event-start-datetime"
-                    name="start_datetime" required>
-            </div>
-            <div>
-                <label for="event-end-datetime">End</label>
-                <input type="datetime-local" id="event-end-datetime"
-                    name="end_datetime" required>
-            </div>
-            <div>
-                <label for="event-description">Description</label>
-                <textarea id="event-description" name="description"
-                    rows="4"></textarea>
-            </div>
-            <div>
-                <label for="calendar-id">Calendar</label>
-                <select id="calendar-id" name="calendar_id" required>
-                    <option value>Select a Calendar</option>
-                    {% for feed in owned_feeds %}
-                    <option value="{{ feed.id }}">{{ feed.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn">Add Event</button>
-        </form>
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-heading text-xxl">Upcoming Events</h1>
+      <p class="hero-text text-md">
+        {% if num_upcoming_events == 0 %} You have no events coming up. {% else
+        %} {% if first_upcoming_event.days_until_start < 0 %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        is currently ongoing and ends in
+        <span class="text-info">{{ first_upcoming_event.days_until_end }}</span>
+        day{% if first_upcoming_event.days_until_end != 1 %}s{% endif %} on
+        <span class="text-info"
+          >{{ first_upcoming_event.end_datetime.strftime('%B %d, %Y') }}</span
+        >. {% elif first_upcoming_event.days_until_start == 0 %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        happens today at
+        <span class="text-info"
+          >{{ first_upcoming_event.start_datetime.strftime('%I:%M %p') }}</span
+        >. {% else %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        happens in
+        <span class="text-info"
+          >{{ first_upcoming_event.days_until_start }}</span
+        >
+        day{% if first_upcoming_event.days_until_start != 1 %}s{% endif %} on
+        <span class="text-info"
+          >{{ first_upcoming_event.start_datetime.strftime('%B %d, %Y') }}</span
+        >. {% endif %} {% endif %}
+      </p>
+      <div class="hero-buttons"></div>
     </div>
+  </div>
+</section>
+
+<section class="event-view bg-dark">
+  <div class="container">
+    <div class="event-view-content">
+      <h2 class="text-xxl text-center event-view-heading">Events</h2>
+      <div class="event-view-filter">
+        <p class="text-lg">Filter by Calendar</p>
+        <form id="filterForm" method="POST" action="/apply_filter">
+          {% for feed in feeds %}
+          <input
+            type="checkbox"
+            id="feed_{{ feed.id }}"
+            name="feed"
+            value="{{ feed.id }}"
+            {%
+            if
+            feed.id|string
+            in
+            selected_feeds
+            %}checked{%
+            endif
+            %}
+          />
+          <label for="feed_{{ feed.id }}">{{ feed.name }}</label><br />
+          {% endfor %}
+        </form>
+
+        <button class="btn btn-primary" onclick="submitForm()">
+          Apply Filter
+        </button>
+        <button class="btn">
+          <a class="" href="/clear_filter">Clear Filter</a>
+        </button>
+      </div>
+
+      <div class="event-view-list">
+        {% for date in sorted_dates %}
+        <div class="event-date">{{ date.strftime('%d.%m.%y') }}</div>
+        {% for event in events_by_date[date] %} {% if event.days_until_start > 0
+        %}
+        <div class="event-item">
+          {{ event.name }} {% if (event.end_datetime -
+          event.start_datetime).days > 1 %}(day {{ (date -
+          event.start_datetime.date()).days }} / {{ (event.end_datetime -
+          event.start_datetime).days }}) {% endif %} | {{ event.feed.name }} |
+          starts in {{ event.days_until_start }} days
+        </div>
+        {% else %}
+        <div class="event-item">
+          {{ event.name }} {% if (event.end_datetime -
+          event.start_datetime).days > 0 %}(day {{ (date -
+          event.start_datetime.date()).days }} / {{ (event.end_datetime -
+          event.start_datetime).days }}) {% endif %} | {{ event.feed.name }} |
+          ends in {{ event.days_until_start }} days
+        </div>
+        {% endif %} {% endfor %} {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="event-card">
+    <h3>Add Event</h3>
+    <form action="/add_event" method="POST">
+      <!-- Update action to your event addition route -->
+      <div>
+        <label for="event-name">Name</label>
+        <input type="text" id="event-name" name="name" required />
+      </div>
+      <div>
+        <label for="event-start-datetime">Start</label>
+        <input
+          type="datetime-local"
+          id="event-start-datetime"
+          name="start_datetime"
+          required
+        />
+      </div>
+      <div>
+        <label for="event-end-datetime">End</label>
+        <input
+          type="datetime-local"
+          id="event-end-datetime"
+          name="end_datetime"
+          required
+        />
+      </div>
+      <div>
+        <label for="event-description">Description</label>
+        <textarea id="event-description" name="description" rows="4"></textarea>
+      </div>
+      <div>
+        <label for="calendar-id">Calendar</label>
+        <select id="calendar-id" name="calendar_id" required>
+          <option value>Select a Calendar</option>
+          {% for feed in owned_feeds %}
+          <option value="{{ feed.id }}">{{ feed.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn">Add Event</button>
+    </form>
+  </div>
 </div>
+
+<script>
+  function submitForm() {
+    document.getElementById("filterForm").submit();
+  }
+</script>
 
 {% endblock %}

@@ -6,9 +6,15 @@
 }
 
 :root {
-  --primary-color: #4891ff;
-  --light-color: #f4f4f6;
-  --dark-color: #111;
+  --primary-color: #4891ff; /* Your primary color */
+  --light-color: #f4f4f6; /* Light background color */
+  --dark-color: #111; /* Dark text color */
+
+  /* Additional Colors */
+  --highlight-color: #4891ff; /* A brighter blue for highlights (similar to primary) */
+  --emphasis-color: #e63946; /* A readable red for emphasis (good contrast with light and dark colors) */
+  --info-color: #cce0ff; /* A soft blue for informational text, matching the theme */
+  --contrast-color: #333; /* Darker color for contrast (good for readability) */
 }
 
 body {
@@ -31,8 +37,8 @@ img {
   max-width: 100%;
 }
 
-/* Navbar */
-
+/* base.html template specific css */
+/* navbar */
 .navbar .container {
   display: flex;
   justify-content: space-between;
@@ -62,6 +68,8 @@ img {
 }
 
 /* Utility classes */
+
+/* container */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -74,17 +82,28 @@ img {
   padding: 0 15px;
 }
 
-/* Buttons */
+/* New container-flex class */
+.container-flex {
+  max-width: 1100px; /* Same max-width as .container */
+  margin: 0 auto; /* Centered */
+  padding: 0 15px; /* Same padding */
+  display: flex; /* Enable flexbox layout */
+  flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+  gap: 15px; /* Optional: add space between flex items */
+}
+
+/* buttons */
 .btn {
   display: inline-block;
   padding: 13px 20px;
-  background-color: var(--light-color);
-  color: var(--dark-color);
+  background: var(--light-color);
+  color: #333;
   font-weight: 600;
   text-decoration: none;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  text-align: center;
   transition: 0.5s;
 }
 
@@ -100,4 +119,71 @@ img {
 .btn-dark {
   background-color: var(--dark-color);
   color: #fff;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+/* text */
+.text-xxl {
+  font-size: 3rem;
+  line-height: 1.2;
+  font-weight: 600;
+  margin: 40px 0 20px;
+}
+
+.text-xl {
+  font-size: 2.2rem;
+  line-height: 1.4;
+  font-weight: normal;
+  margin: 40px 0 20px;
+}
+
+.text-lg {
+  font-size: 1.8rem;
+  line-height: 1.4;
+  font-weight: normal;
+  margin: 30px 0 20px;
+}
+
+.text-md {
+  font-size: 1.2rem;
+  line-height: 1.4;
+  font-weight: normal;
+  margin: 20px 0 10px;
+}
+
+.text-sm {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  font-weight: normal;
+  margin: 10px 0 5px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-highlight {
+  font-weight: bold; /* Makes the text bold */
+  color: var(--highlight-color); /* Bright color for highlights */
+}
+
+.text-emphasis {
+  font-style: italic; /* Italicizes the text for emphasis */
+  color: var(--emphasis-color); /* Color for emphasis */
+}
+
+.text-info {
+  background-color: var(--info-color); /* Light background for info */
+  padding: 0 0.2em; /* Slight padding */
+  border-radius: 4px; /* Rounded corners */
+  color: var(--dark-color); /* Ensure text is readable */
+}
+
+/* Optional: Add contrast class */
+.text-contrast {
+  color: var(--contrast-color); /* For darker text */
 }
