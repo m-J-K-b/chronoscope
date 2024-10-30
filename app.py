@@ -1,8 +1,8 @@
 import os
 import secrets
-from datetime import date, datetime, timezone, timedelta
+from datetime import date, datetime, timedelta, timezone
+from urllib.parse import urljoin, urlparse
 
-from urllib.parse import urlparse, urljoin
 import requests
 from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
@@ -299,12 +299,9 @@ def index():
 
     owned_feeds = CalendarFeed.query.filter_by(owned=True).all()
 
-    # If no feeds are selected, show all events
     events = Event.query.filter(Event.end_datetime > today).order_by(
         Event.start_datetime
     )
-
-    # Filter events based on selected feeds if filters are selected
     if selected_feed_ids:
         events = events.filter(Event.calendar_feed_id.in_(selected_feed_ids))
     events = events.all()
@@ -331,7 +328,7 @@ def index():
     sorted_dates = sorted(events_by_date.keys())
 
     # Get upcoming events
-    upcoming_events = [event for event in events if event.days_until_start < 5]
+    upcoming_events = [event for event in events if 0 < event.days_until_start < 5]
 
     # Sort upcoming events by days_until_start
     upcoming_events_sorted = sorted(upcoming_events, key=lambda e: e.days_until_start)

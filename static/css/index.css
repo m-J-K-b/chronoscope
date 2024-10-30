@@ -10,6 +10,39 @@
   width: 70%;
 }
 
+.event-view-heading {
+  padding: 50px 0;
+}
+
+.event-view-filter {
+  margin-bottom: 50px;
+}
+
+.event-view-filter form {
+  margin-left: 10px;
+}
+
+.event-view-filter .btn {
+  margin: 10px 10px;
+}
+
+.event-date {
+  display: block;
+  width: 100%;
+  margin: 10px;
+}
+
+.event-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: left;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: var(--contrast-color);
+}
+
 .CellWithComment {
   position: relative;
 }

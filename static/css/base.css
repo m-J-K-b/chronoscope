@@ -183,7 +183,13 @@ img {
   color: var(--dark-color); /* Ensure text is readable */
 }
 
-/* Optional: Add contrast class */
 .text-contrast {
   color: var(--contrast-color); /* For darker text */
+}
+
+/* backgroundcolor classes */
+
+.bg-dark {
+  background-color: var(--dark-color);
+  color: white;
 }
