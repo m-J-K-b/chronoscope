@@ -33,12 +33,37 @@
 .event-item {
   width: 100%;
   display: flex;
-  justify-content: space-around;
-  align-items: left;
+  justify-content: space-between; /* Adjusted for uniform spacing */
+  align-items: center; /* Center align items vertically */
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
   background-color: var(--contrast-color);
+}
+
+.event-item span {
+  flex: 1; /* Allow spans to take equal space */
+}
+
+.event-name {
+  flex: 1; /* Allow first span to take available space */
+  text-align: left; /* Align the first span (event name) to the left */
+  overflow: hidden; /* Hides overflow content */
+  white-space: nowrap; /* Prevents text from wrapping */
+  text-overflow: ellipsis; /* Displays ellipsis for overflowed text */
+}
+
+.event-calendar,
+.event-ongoing-duration {
+  margin-left: auto; /* Pushes the last span to the right */
+  text-align: center; /* Align text to the right */
+}
+
+.event-start,
+.event-end {
+  /* Style for the last spans */
+  margin-left: auto; /* Pushes the last span to the right */
+  text-align: right; /* Align text to the right */
 }
 
 .sticky-container {
@@ -51,10 +76,6 @@
   align-self: flex-start;
 }
 
-/* Sticky form */
-.add-event-form,
-.event-view-filter {
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for visual separation */
+.event-view-filter-btns {
+  margin-top: 10px;
 }

@@ -1,7 +1,6 @@
 import os
 import secrets
-from datetime import date, datetime, timedelta, timezone
-from tracemalloc import start
+from datetime import date, datetime, time, timedelta, timezone
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -59,14 +58,14 @@ class Event(db.Model):
     def days_until_start(self):
         """Calculate days until the event starts."""
         if self.start_datetime:
-            return (self.start_datetime - datetime.now()).days
+            return (self.start_datetime.date() - datetime.now().date()).days
         return None
 
     @property
     def days_until_end(self):
         """Calculate days until the event ends."""
         if self.end_datetime:
-            return (self.end_datetime - datetime.now()).days
+            return (self.end_datetime.date() - datetime.now().date()).days
         return None
 
 
@@ -84,23 +83,6 @@ def fetch_ics_feed(url):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching URL: {url}\n{e}")
         return None
-
-
-# Function to calculate days until the event, considering timezone awareness
-def days_until_event(event_date):
-    today = datetime.now()
-
-    # Check if event_date is timezone-aware
-    if (
-        event_date.tzinfo is not None
-        and event_date.tzinfo.utcoffset(event_date) is not None
-    ):
-        # Convert the current date to timezone-aware in UTC
-        today = today.astimezone(timezone.utc)
-
-    # Calculate the difference
-    delta = event_date - today
-    return delta.days
 
 
 # Function to process each calendar feed and store events in the database
@@ -136,6 +118,9 @@ def process_calendar_feed(feed):
                 start_datetime = datetime.combine(start_datetime, datetime.min.time())
             if isinstance(end_datetime, date):
                 end_datetime = datetime.combine(end_datetime, datetime.min.time())
+
+            if (end_datetime.date() - start_datetime.date()).days == 1:
+                end_datetime = start_datetime
 
             # Store the start and end dates
             new_event = Event(
@@ -209,43 +194,41 @@ def clear_filter():
     return redirect("/")
 
 
-@app.route("/add_feed", methods=["POST"])
-def add_feed():
-    if request.method == "POST":
-        feed_url = request.form["url"]
-        feed_name = request.form["name"]  # Get the custom name for the feed
+@app.route("/add_calendar", methods=["POST"])
+def add_calendar():
+    feed_name = request.form["name"]
+    feed_url = request.form.get("url")
 
-        # Check if the feed already exists
-        if not CalendarFeed.query.filter_by(url=feed_url).first():
-            # Add the new feed with the custom name
-            new_feed = CalendarFeed(url=feed_url, name=feed_name)
-            db.session.add(new_feed)
-            db.session.commit()
-            if process_calendar_feed(new_feed):
-                flash("Feed has been added.", "success")
-            else:
-                flash("Feed couldn't be processed.", "danger")
+    # Check for existing calendar or feed
+    existing = CalendarFeed.query.filter(
+        (CalendarFeed.url == feed_url) | (CalendarFeed.name == feed_name)
+    ).first()
+
+    if existing:
+        flash(
+            (
+                "Feed with this URL already exists."
+                if feed_url
+                else "Calendar with this name already exists."
+            ),
+            "danger",
+        )
+    else:
+        new_feed = CalendarFeed(name=feed_name, url=feed_url, owned=feed_url is None)
+        db.session.add(new_feed)
+        db.session.commit()
+
+        if feed_url and not process_calendar_feed(new_feed):
+            flash("Feed couldn't be processed.", "danger")
         else:
-            flash("Feed with this URL already exists.", "danger")
-
-        return redirect(url_for("manage_feeds"))
-
-
-@app.route("/create_calendar", methods=["POST"])
-def create_calendar():
-    if request.method == "POST":
-        feed_name = request.form["name"]  # Get the custom name for the owned calendar
-
-        # Create a new owned calendar
-        if not CalendarFeed.query.filter_by(name=feed_name).first():
-            new_calendar = CalendarFeed(
-                name=feed_name, url=None, owned=True
-            )  # Set url to None for owned calendars
-            db.session.add(new_calendar)
-            db.session.commit()
-            flash("Calendar has been created.", "success")
-        else:
-            flash("Calendar with this name already exists.", "danger")
+            flash(
+                (
+                    "Calendar has been created."
+                    if feed_url is None
+                    else "Feed has been added."
+                ),
+                "success",
+            )
 
     return redirect(url_for("manage_feeds"))
 
@@ -295,12 +278,12 @@ def add_event():
 @app.route("/", methods=["GET", "POST"])
 def index():
     selected_feed_ids = session.get("selected_feed_ids", [])
-    today = datetime.now()
-    today_date = today.date()
+    today_date = date.today()
+    today_datetime = datetime.combine(today_date, time.min)
 
     owned_feeds = CalendarFeed.query.filter_by(owned=True).all()
 
-    events = Event.query.filter(Event.end_datetime > today).order_by(
+    events = Event.query.filter(Event.end_datetime >= today_datetime).order_by(
         Event.start_datetime
     )
     if selected_feed_ids:

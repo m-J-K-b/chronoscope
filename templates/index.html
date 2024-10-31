@@ -73,20 +73,37 @@
                     {% for event in events_by_date[date] %}
                     <div class="event-item">
                         <span class="event-name">{{ event.name }}</span>
-                        {% if (event.end_datetime - event.start_datetime).days >
-                        0 %}
-                        (day {{ (date - event.start_datetime.date()).days + 1 }}
-                        / {{ (event.end_datetime - event.start_datetime).days +
-                        1 }})
-                        {% endif %}
+                        <span class="event-ongoing-duration">
+                            {% if (event.end_datetime -
+                            event.start_datetime).days >
+                            0 %}
+                            day {{ (date - event.start_datetime.date()).days +
+                            1 }}
+                            / {{ (event.end_datetime -
+                            event.start_datetime).days +
+                            1 }}
+                            {% endif %}
+                        </span>
                         <span class="event-calendar">{{ event.feed.name
                             }}</span>
                         {% if event.days_until_start > 0 %}
+                        {% if event.days_until_start == 1 %}
+                        <span class="event-start">starts tomorrow</span>
+                        {% elif event.days_until_start == 0 %}
+                        <span class="event-start">starts today</span>
+                        {% else %}
                         <span class="event-start">starts in {{
                             event.days_until_start }} days</span>
+                        {% endif %}
+                        {% else %}
+                        {% if event.days_until_end == 0 %}
+                        <span class="event-end">ends today</span>
+                        {% elif event.days_until_end == 1 %}
+                        <span class="event-end">ends tomorrow</span>
                         {% else %}
                         <span class="event-end">ends in {{ event.days_until_end
                             }} days</span>
+                        {% endif %}
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -100,29 +117,38 @@
                 <div class="sticky-container">
                     <!-- Filter -->
                     <div class="event-view-filter">
-                        <p class="text-lg">Filter by Calendar</p>
-                        <form id="filterForm" method="POST"
+                        <p class="text-md">Filter by Calendar</p>
+                        <form class="event-view-filter-form" method="POST"
                             action="/apply_filter">
-                            {% for feed in feeds %}
-                            <input type="checkbox" id="feed_{{ feed.id }}"
-                                name="feed" value="{{ feed.id }}"
-                                {% if feed.id|string in selected_feeds
-                                %}checked{% endif %} />
-                            <label for="feed_{{ feed.id }}">{{ feed.name
-                                }}</label><br />
-                            {% endfor %}
+                            <ul>
+                                {% for feed in feeds %}
+                                <li>
+
+                                    <input type="checkbox"
+                                        id="feed_{{ feed.id }}"
+                                        name="feed" value="{{ feed.id }}"
+                                        {% if feed.id|string in selected_feeds
+                                        %}checked{% endif %} />
+                                    <label class="form-check-label"
+                                        for="feed_{{ feed.id }}">{{ feed.name
+                                        }}</label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+
                             <div class="event-view-filter-btns">
                                 <button class="btn btn-primary"
                                     type="submit">Apply Filter</button>
-                                <a class="btn" href="/clear_filter">Clear
-                                    Filter</a>
+                                <button class="btn" type="button"
+                                    onclick="window.location.href='/clear_filter';">Clear
+                                    Filter</button>
                             </div>
                         </form>
                     </div>
 
                     <!-- Event Form -->
-                    <div class="event-card">
-                        <p class="text-lg">Add event</p>
+                    <div class="add-event-form">
+                        <p class="text-md">Add event</p>
                         <form action="/add_event" method="POST">
                             <div>
                                 <label for="event-name">Name</label>

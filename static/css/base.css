@@ -37,6 +37,46 @@ img {
   max-width: 100%;
 }
 
+form input:not([type="checkbox"]):not([type="radio"]),
+form textarea,
+form select {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+/* Focus styling for inputs, textarea, and select elements */
+form input:not([type="checkbox"]):not([type="radio"]):focus,
+form textarea:focus,
+form select:focus {
+  border-color: #a7d2ff;
+  outline: none;
+}
+
+/* Checkbox and radio button styling */
+form input[type="checkbox"],
+form input[type="radio"] {
+  width: auto;
+  margin-right: 0.5rem; /* Adds space between checkbox/radio and label */
+}
+
+/* General label styling */
+form label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Specific styling for labels next to checkboxes and radio buttons */
+form input[type="checkbox"] + label,
+form input[type="radio"] + label {
+  display: inline-block; /* Keep these labels inline */
+  margin-bottom: 0.5rem; /* Remove bottom margin */
+}
+
 /* base.html template specific css */
 /* navbar */
 .navbar .container {

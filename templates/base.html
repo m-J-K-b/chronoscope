@@ -21,6 +21,8 @@
 
         <!-- stylesheets -->
         <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/normalize.css') }}">
+        <link rel="stylesheet"
             href="{{ url_for('static', filename='css/base.css') }}">
         <link rel="stylesheet"
             href="{{ url_for('static', filename='css/flash_messages.css') }}">
@@ -46,7 +48,8 @@
                     <ul class>
                         <li><a href="/">Home</a></li>
                         <li><a href="/manage_feeds">Manage Feeds</a></li>
-                        <li><a class="btn" href="/reprocess_feeds?redirect_url=/"><i
+                        <li><a class="btn"
+                                href="/reprocess_feeds?redirect_url=/"><i
                                     class="fa-solid fa-rotate-right"></i>Reprocess</a></li>
                     </ul>
                 </div>
@@ -62,7 +65,7 @@
                 <p>&copy; 2024 My Website</p>
             </div>
         </footer>
-        
+
         <script>
         fetch('/reprocess_feeds');
         </script>
