@@ -1,6 +1,7 @@
 import os
 import secrets
 from datetime import date, datetime, timedelta, timezone
+from tracemalloc import start
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -308,7 +309,6 @@ def index():
 
     # Prepare data structure to group events by date
     events_by_date = {}
-
     for event in events:
         # Get the start date for the event
         start_date = event.start_datetime.date()
@@ -316,9 +316,7 @@ def index():
 
         # Add events to the dictionary for all days from start to end
         current_date = start_date
-        while current_date >= today_date and current_date <= end_date - timedelta(
-            days=1
-        ):
+        while current_date >= today_date and current_date <= end_date:
             if current_date not in events_by_date:
                 events_by_date[current_date] = []
             events_by_date[current_date].append(event)

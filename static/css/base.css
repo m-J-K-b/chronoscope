@@ -99,7 +99,7 @@ img {
   background: var(--light-color);
   color: #333;
   font-weight: 600;
-  text-decoration: none;
+  text-decoration: none; /* Ensures no underline on <a> */
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -192,4 +192,9 @@ img {
 .bg-dark {
   background-color: var(--dark-color);
   color: white;
+}
+
+.bg-black {
+  background-color: #000;
+  color: var(--light-color);
 }
