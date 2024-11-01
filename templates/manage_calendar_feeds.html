@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Feeds - Event Countdown{% endblock %}
+{% block head %}
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/manage_calendar_feeds.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-heading text-xxl">Manage Feeds</h1>
+            <p class="hero-text">
+                Manage your calendar feeds easily. Add new calendars or feeds
+                and view your existing ones to keep track of all your events.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="feed-manager bg-dark">
+    <div class="container">
+        <div class="feed-manager-content">
+
+            <h2 class="text-xl">Calendar Feeds</h2>
+
+            <div class="add-calendar-form">
+                <p><strong>Add Calendar</strong></p>
+                <form action="/add_calendar_feed" method="post"
+                    class="event-form">
+                    <label for="calendar-name">Calendar Name</label>
+                    <input type="text" id="calendar-name" name="name" required>
+                    <label for="feed-url">Feed URL:</label>
+                    <input type="url" id="feed-url" name="url">
+                    <button class="btn btn-primary" type="submit">Create
+                        Calendar</button>
+                </form>
+            </div>
+
+            <div class="feed-list">
+                {% for calendar_feed in calendar_feeds %}
+                <p>{{calendar_feed.name}}</p>
+                <form action="/delete_calendar_feed/{{ calendar_feed.id }}"
+                    method="POST">
+                    <button type="submit" class="btn">Remove</button>
+                </form>
+                {% else %}
+                <p>no calendar feeds</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

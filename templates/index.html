@@ -121,16 +121,19 @@
                         <form class="event-view-filter-form" method="POST"
                             action="/apply_filter">
                             <ul>
-                                {% for feed in feeds %}
+                                {% for calendar_feed in calendar_feeds %}
                                 <li>
 
                                     <input type="checkbox"
-                                        id="feed_{{ feed.id }}"
-                                        name="feed" value="{{ feed.id }}"
-                                        {% if feed.id|string in selected_feeds
+                                        id="calendar_feed_{{ calendar_feed.id }}"
+                                        name="calendar_feed"
+                                        value="{{ calendar_feed.id }}"
+                                        {% if calendar_feed.id|string in
+                                        selected_calendar_feed_ids
                                         %}checked{% endif %} />
                                     <label class="form-check-label"
-                                        for="feed_{{ feed.id }}">{{ feed.name
+                                        for="calendar_feed_{{ calendar_feed.id }}">{{
+                                        calendar_feed.name
                                         }}</label>
                                 </li>
                                 {% endfor %}
@@ -174,11 +177,10 @@
                                     name="description" rows="4"></textarea>
                             </div>
                             <div>
-                                <label for="calendar-id">Calendar</label>
-                                <select id="calendar-id" name="calendar_id"
+                                <select id="calendar-id" name="calendar_feed_id"
                                     required>
                                     <option value>Select a Calendar</option>
-                                    {% for feed in owned_feeds %}
+                                    {% for feed in owned_calendar_feeds %}
                                     <option value="{{ feed.id }}">{{ feed.name
                                         }}</option>
                                     {% endfor %}

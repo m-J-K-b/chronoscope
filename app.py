@@ -1,5 +1,6 @@
 import os
 import secrets
+from curses import meta
 from datetime import date, datetime, time, timedelta, timezone
 from urllib.parse import urljoin, urlparse
 
@@ -75,7 +76,7 @@ with app.app_context():
 
 
 # Function to fetch and parse ICS feed from URL
-def fetch_ics_feed(url):
+def fetch_ics_calendar_feeds(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -86,8 +87,8 @@ def fetch_ics_feed(url):
 
 
 # Function to process each calendar feed and store events in the database
-def process_calendar_feed(feed):
-    ics_data = fetch_ics_feed(feed.url)
+def process_calendar_feed(calendar_feed):
+    ics_data = fetch_ics_calendar_feeds(calendar_feed.url)
     if not ics_data:
         return False
 
@@ -95,11 +96,11 @@ def process_calendar_feed(feed):
     try:
         calendar = Calendar.from_ical(ics_data)
     except Exception as e:
-        print(f"Error parsing calendar feed from {feed.url}\n{e}")
+        print(f"Error parsing calendar calendar feed from {calendar_feed.url}\n{e}")
         return False
 
     # Clear any existing events for this feed to avoid duplicates
-    Event.query.filter_by(calendar_feed_id=feed.id).delete()
+    Event.query.filter_by(calendar_feed_id=calendar_feed.id).delete()
     db.session.commit()
 
     # Loop through the events and calculate days until each event
@@ -128,7 +129,7 @@ def process_calendar_feed(feed):
                 description=description,
                 start_datetime=start_datetime,
                 end_datetime=end_datetime,
-                calendar_feed_id=feed.id,
+                calendar_feed_id=calendar_feed.id,
             )
 
             db.session.add(new_event)
@@ -137,30 +138,30 @@ def process_calendar_feed(feed):
     return True
 
 
-@app.route("/reprocess_feeds")
-def reprocess_feeds():
+@app.route("/reprocess_calendar_feeds", methods=["POST"])
+def reprocess_calendar_feeds():
     redirect_url = request.args.get("redirect_url", "")
 
     # Fetch IDs of all imported calendar feeds
-    imported_feed_ids = (
+    imported_calendar_feed_ids = (
         CalendarFeed.query.filter_by(owned=False).with_entities(CalendarFeed.id).all()
     )
 
     # Flatten the list of tuples to a list of IDs
-    imported_feed_ids = [feed_id[0] for feed_id in imported_feed_ids]
+    imported_calendar_feed_ids = [feed_id[0] for feed_id in imported_calendar_feed_ids]
 
     # Clear existing events to avoid duplication
-    Event.query.filter(Event.calendar_feed_id.in_(imported_feed_ids)).delete()
+    Event.query.filter(Event.calendar_feed_id.in_(imported_calendar_feed_ids)).delete()
 
     # Fetch the feeds for reprocessing
-    imported_feeds = CalendarFeed.query.filter_by(owned=False).all()
+    imported_calendar_feeds = CalendarFeed.query.filter_by(owned=False).all()
 
     # Process each feed and handle any errors
-    for feed in imported_feeds:
-        if not process_calendar_feed(feed):
-            flash(f"Feed '{feed.name}' couldn't be processed", "danger")
+    for calendar_feed in imported_calendar_feeds:
+        if not process_calendar_feed(calendar_feed):
+            flash(f"Feed '{calendar_feed.name}' couldn't be processed", "danger")
 
-    flash("All feeds have been reprocessed.", "success")
+    flash("All calendar feeds have been reprocessed.", "success")
 
     # Sanitize and validate the redirect_url
     redirect_url = urljoin(request.host_url, redirect_url)  # Combine with base URL
@@ -175,10 +176,10 @@ def reprocess_feeds():
 @app.route("/apply_filter", methods=["POST"])
 def apply_filter():
     # Get the selected feed IDs from the form
-    selected_feed_ids = request.form.getlist("feed")
+    selected_calendar_feed_ids = request.form.getlist("calendar_feed")
 
     # Store the selected feed IDs in the session
-    session["selected_feed_ids"] = selected_feed_ids
+    session["selected_calendar_feed_ids"] = selected_calendar_feed_ids
 
     # Flash message to notify that the filter has been applied
     flash("Filter has been applied.", "success")
@@ -189,61 +190,71 @@ def apply_filter():
 
 @app.route("/clear_filter")
 def clear_filter():
-    session.pop("selected_feed_ids", None)  # Remove selected_feed_ids from session
+    session.pop(
+        "selected_calendar_feed_ids", None
+    )  # Remove selected_feed_ids from session
     flash("Filter has been cleared.", "info")
     return redirect("/")
 
 
-@app.route("/add_calendar", methods=["POST"])
-def add_calendar():
-    feed_name = request.form["name"]
-    feed_url = request.form.get("url")
+@app.route("/add_calendar_feed", methods=["POST"])
+def add_calendar_feed():
+    calendar_feed_name = request.form["name"]
+    calendar_feed_url = request.form.get("url", None)
+    if calendar_feed_url == "":
+        calendar_feed_url = None
 
     # Check for existing calendar or feed
-    existing = CalendarFeed.query.filter(
-        (CalendarFeed.url == feed_url) | (CalendarFeed.name == feed_name)
-    ).first()
+    query = CalendarFeed.query.filter(CalendarFeed.name == calendar_feed_name)
+    # Conditionally add the URL condition if calendar_feed_url is not None
+    if calendar_feed_url is not None:
+        query = query.filter(CalendarFeed.url == calendar_feed_url)
+    existing = query.first()
 
     if existing:
         flash(
             (
-                "Feed with this URL already exists."
-                if feed_url
-                else "Calendar with this name already exists."
+                "Calendar Feed with this URL already exists."
+                if calendar_feed_url
+                else "Calendar calendar feed with this name already exists."
             ),
             "danger",
         )
     else:
-        new_feed = CalendarFeed(name=feed_name, url=feed_url, owned=feed_url is None)
-        db.session.add(new_feed)
+        new_calendar_feed = CalendarFeed(
+            name=calendar_feed_name,
+            url=calendar_feed_url,
+            owned=calendar_feed_url is None,
+        )
+        db.session.add(new_calendar_feed)
         db.session.commit()
 
-        if feed_url and not process_calendar_feed(new_feed):
+        if calendar_feed_url and not process_calendar_feed(new_calendar_feed):
             flash("Feed couldn't be processed.", "danger")
         else:
             flash(
                 (
-                    "Calendar has been created."
-                    if feed_url is None
-                    else "Feed has been added."
+                    "Calendar feed has been created."
+                    if calendar_feed_url is None
+                    else "Calendar feed has been added."
                 ),
                 "success",
             )
 
-    return redirect(url_for("manage_feeds"))
+    return redirect(url_for("manage_calendar_feeds"))
 
 
-@app.route("/delete_feed/<int:feed_id>", methods=["POST"])
-def delete_feed(feed_id):
-    feed = CalendarFeed.query.get_or_404(feed_id)
+@app.route("/delete_calendar_feed/<int:calendar_feed_id>", methods=["POST"])
+def delete_calendar_feed(calendar_feed_id):
+    calendar_feed = CalendarFeed.query.get_or_404(calendar_feed_id)
 
     # Delete the feed and its associated events
-    db.session.delete(feed)
+    db.session.delete(calendar_feed)
     db.session.commit()
 
-    flash("Feed has been removed.", "success")
+    flash("Calendar feed has been deleted.", "success")
 
-    return redirect(url_for("manage_feeds"))
+    return redirect(url_for("manage_calendar_feeds"))
 
 
 @app.route("/add_event", methods=["POST"])
@@ -253,14 +264,14 @@ def add_event():
         start_datetime_str = request.form["start_datetime"]
         end_datetime_str = request.form["end_datetime"]
         description = request.form["description"]
-        calendar_id = int(request.form["calendar_id"])
+        calendar_feed_id = int(request.form["calendar_feed_id"])
 
         start_datetime = datetime.strptime(start_datetime_str, "%Y-%m-%dT%H:%M")
         end_datetime = datetime.strptime(end_datetime_str, "%Y-%m-%dT%H:%M")
 
         # Here you would add the logic to save the event to the database.
         new_event = Event(
-            calendar_feed_id=calendar_id,
+            calendar_feed_id=calendar_feed_id,
             name=name,
             description=description,
             start_datetime=start_datetime,
@@ -277,17 +288,17 @@ def add_event():
 # Route to display all events from the database
 @app.route("/", methods=["GET", "POST"])
 def index():
-    selected_feed_ids = session.get("selected_feed_ids", [])
+    selected_calendar_feed_ids = session.get("selected_calendar_feed_ids", [])
     today_date = date.today()
     today_datetime = datetime.combine(today_date, time.min)
 
-    owned_feeds = CalendarFeed.query.filter_by(owned=True).all()
+    owned_calendar_feeds = CalendarFeed.query.filter_by(owned=True).all()
 
     events = Event.query.filter(Event.end_datetime >= today_datetime).order_by(
         Event.start_datetime
     )
-    if selected_feed_ids:
-        events = events.filter(Event.calendar_feed_id.in_(selected_feed_ids))
+    if selected_calendar_feed_ids:
+        events = events.filter(Event.calendar_feed_id.in_(selected_calendar_feed_ids))
     events = events.all()
 
     # Prepare data structure to group events by date
@@ -322,22 +333,19 @@ def index():
         "index.html",
         events_by_date=events_by_date,
         sorted_dates=sorted_dates,
-        feeds=CalendarFeed.query.all(),
-        owned_feeds=owned_feeds,
-        selected_feeds=selected_feed_ids,
+        calendar_feeds=CalendarFeed.query.all(),
+        owned_calendar_feeds=owned_calendar_feeds,
+        selected_calendar_feed_ids=selected_calendar_feed_ids,
         num_upcoming_events=num_upcoming_events,
         first_upcoming_event=first_upcoming_event,
     )
 
 
-@app.route("/manage_feeds")
-def manage_feeds():
+@app.route("/manage_calendar_feeds")
+def manage_calendar_feeds():
     # Fetch all the existing calendar feeds to display them
-    owned_feeds = CalendarFeed.query.filter_by(owned=True).all()
-    imported_feeds = CalendarFeed.query.filter_by(owned=False).all()
-    return render_template(
-        "manage_feeds.html", imported_feeds=imported_feeds, owned_feeds=owned_feeds
-    )
+    calendar_feeds = CalendarFeed.query.all()
+    return render_template("manage_calendar_feeds.html", calendar_feeds=calendar_feeds)
 
 
 if __name__ == "__main__":
