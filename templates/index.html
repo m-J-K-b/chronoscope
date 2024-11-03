@@ -62,7 +62,7 @@
     <div class="container">
         <div class="event-view-content">
             <h2 class="text-xxl text-center event-view-heading">Events</h2>
-            <div class="event-content-container">
+            <div class="event-view-content-container">
 
                 <!-- Event List -->
                 <div class="event-view-list">
@@ -105,6 +105,27 @@
                             }} days</span>
                         {% endif %}
                         {% endif %}
+                        <div class="event-detail-card">
+                            <div class="event-detail-left">
+                                <h4 class="text-md">{{ event.name }}</h4>
+                                <p class="text-sm">
+                                    {% if event.description %}
+                                    {{ event.description }}
+                                    {% else %}
+                                    no description for this event
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="event-detail-card-divider"></div>
+                            <div class="event-detail-right">
+                                <p class="text-sm">Location: {{ event.location
+                                    }}</p>
+                                <p class="text-sm">Time: {{
+                                    event.start_datetime.strftime('%H:%M') }} -
+                                    {{ event.end_datetime.strftime('%H:%M')
+                                    }}</p>
+                            </div>
+                        </div>
                     </div>
                     {% endfor %}
                     {% endfor %}
@@ -194,5 +215,36 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const startDateTimeInput = document.getElementById("event-start-datetime");
+        const endDateTimeInput = document.getElementById("event-end-datetime");
+    
+        startDateTimeInput.addEventListener("input", function() {
+            // Set end time to be one hour after the start time
+            const startTime = new Date(startDateTimeInput.value);
+            if (startTime) {
+                const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
+                endDateTimeInput.value = endTime.toISOString().slice(0, 16); // Format as datetime-local
+            }
+        });
+    
+        function validateDateTimes() {
+            const startTime = new Date(startDateTimeInput.value);
+            const endTime = new Date(endDateTimeInput.value);
+            
+            if (startTime && endTime && endTime <= startTime) {
+                endDateTimeInput.setCustomValidity("End time must be after start time.");
+            } else {
+                endDateTimeInput.setCustomValidity(""); // Clear the custom error
+            }
+        }
+    
+        // Validate on both inputs
+        startDateTimeInput.addEventListener("input", validateDateTimes);
+        endDateTimeInput.addEventListener("input", validateDateTimes);
+    });
+    </script>
 
 {% endblock %}

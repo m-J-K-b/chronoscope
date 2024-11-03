@@ -14,31 +14,83 @@
   padding: 50px 0;
 }
 
-.event-content-container {
+.event-view-content-container {
   display: flex;
   gap: 2rem;
-  align-items: flex-start; /* Align items to the top */
-}
-
-.event-view-list {
-  flex: 1;
+  align-items: flex-start;
 }
 
 .event-date {
   display: block;
   width: 100%;
-  margin: 10px;
+  margin: 10px 0;
+}
+
+.event-view-list {
+  position: relative; /* Establishes a stacking context */
+  overflow: visible; /* Prevents clipping of overflowed content */
+  flex-basis: calc(
+    60% - 1rem
+  ); /* Adjust based on preferred width distribution */
+  max-width: 1100px;
 }
 
 .event-item {
+  position: relative;
   width: 100%;
   display: flex;
-  justify-content: space-between; /* Adjusted for uniform spacing */
-  align-items: center; /* Center align items vertically */
+  justify-content: space-between;
+  align-items: center;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
   background-color: var(--contrast-color);
+  z-index: 1;
+  transition: transform 0.2s, z-index 0s; /* Apply z-index on hover instantly */
+}
+
+.event-detail-card {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #666;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  opacity: 0;
+  z-index: 10; /* Ensure it's above sibling event items */
+}
+
+.event-item:hover {
+  background-color: #666;
+  transform: scale(1.01);
+  z-index: 20; /* Bring the entire event-item above others on hover */
+}
+
+.event-item:hover .event-detail-card {
+  opacity: 1;
+}
+
+.event-detail-left {
+  flex: 1; /* Allows the left section to take up remaining space */
+}
+
+.event-detail-right {
+  text-align: left; /* Aligns text to the right side */
+  flex-basis: 20%; /* Restricts width to allow space for description */
+}
+
+.event-detail-right p {
+  margin: 0; /* Ensures paragraphs align closely */
+}
+
+.event-detail-card-divider {
+  width: 1px;
+  background-color: #333;
+  margin: 0 10px;
 }
 
 .event-item span {
@@ -67,13 +119,14 @@
 }
 
 .sticky-container {
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   gap: 2rem;
   position: sticky;
   top: 20px; /* Distance from the top of the viewport */
   max-width: 300px; /* Keep the sticky container from stretching */
   align-self: flex-start;
+  flex-basis: calc(40% - 1rem);
 }
 
 .event-view-filter-btns {
