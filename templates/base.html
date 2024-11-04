@@ -49,9 +49,15 @@
                         <li><a href="/">Home</a></li>
                         <li><a href="/manage_calendar_feeds">Manage
                                 Feeds</a></li>
-                        <li><a class="btn"
-                                href="/reprocess_calendar_feeds?redirect_url=/"><i
-                                    class="fa-solid fa-rotate-right"></i>Reprocess</a></li>
+                        <li><form
+                                action="/reprocess_calendar_feeds"
+                                method="post">
+                                <input type="text" name="redirect_url"
+                                    value="/" hidden>
+                                <button class="btn"><i
+                                        class="fa-solid fa-rotate-right"></i>
+                                    Reprocess</button>
+                            </form></li>
                     </ul>
                 </div>
             </div>
