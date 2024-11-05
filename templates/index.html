@@ -1,250 +1,240 @@
 {% extends 'base.html' %} {% block head %}
 <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='css/index.css') }}" />
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/index.css') }}"
+/>
 {% endblock %} {% block title %}Upcoming Events - Event Countdown{% endblock %}
 {% block content %}
 
 <section class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <h1 class="hero-heading text-xxl">Upcoming Events</h1>
-            <p class="hero-text text-md">
-                {% if num_upcoming_events == 0 %} You have no events coming up.
-                {% else
-                %} {% if first_upcoming_event.days_until_start < 0 %} You have
-                <span class="text-info">{{ num_upcoming_events }}</span> events
-                coming
-                up. The next event
-                <a
-                    href="event_view/{{ first_upcoming_event.id }}"
-                    class="text-highlight">{{ first_upcoming_event.name }}</a>
-                is currently ongoing and ends in
-                <span class="text-info">{{ first_upcoming_event.days_until_end
-                    }}</span>
-                day{% if first_upcoming_event.days_until_end != 1 %}s{% endif %}
-                on
-                <span class="text-info">{{
-                    first_upcoming_event.end_datetime.strftime('%B %d, %Y')
-                    }}</span>. {% elif first_upcoming_event.days_until_start ==
-                0 %} You have
-                <span class="text-info">{{ num_upcoming_events }}</span> events
-                coming
-                up. The next event
-                <a
-                    href="event_view/{{ first_upcoming_event.id }}"
-                    class="text-highlight">{{ first_upcoming_event.name }}</a>
-                happens today at
-                <span class="text-info">{{
-                    first_upcoming_event.start_datetime.strftime('%I:%M %p')
-                    }}</span>. {% else %} You have
-                <span class="text-info">{{ num_upcoming_events }}</span> events
-                coming
-                up. The next event
-                <a
-                    href="event_view/{{ first_upcoming_event.id }}"
-                    class="text-highlight">{{ first_upcoming_event.name }}</a>
-                happens in
-                <span class="text-info">{{ first_upcoming_event.days_until_start
-                    }}</span>
-                day{% if first_upcoming_event.days_until_start != 1 %}s{% endif
-                %} on
-                <span class="text-info">{{
-                    first_upcoming_event.start_datetime.strftime('%B %d, %Y')
-                    }}</span>. {% endif %} {% endif %}
-            </p>
-            <div class="hero-buttons"></div>
-        </div>
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-heading text-xxl">Upcoming Events</h1>
+      <p class="hero-text text-md">
+        {% if num_upcoming_events == 0 %} You have no events coming up. {% else
+        %} {% if first_upcoming_event.days_until_start < 0 %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        is currently ongoing and ends in
+        <span class="text-info">{{ first_upcoming_event.days_until_end }}</span>
+        day{% if first_upcoming_event.days_until_end != 1 %}s{% endif %} on
+        <span class="text-info"
+          >{{ first_upcoming_event.end_datetime.strftime('%B %d, %Y') }}</span
+        >. {% elif first_upcoming_event.days_until_start == 0 %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        happens today at
+        <span class="text-info"
+          >{{ first_upcoming_event.start_datetime.strftime('%I:%M %p') }}</span
+        >. {% else %} You have
+        <span class="text-info">{{ num_upcoming_events }}</span> events coming
+        up. The next event
+        <a
+          href="event_view/{{ first_upcoming_event.id }}"
+          class="text-highlight"
+          >{{ first_upcoming_event.name }}</a
+        >
+        happens in
+        <span class="text-info"
+          >{{ first_upcoming_event.days_until_start }}</span
+        >
+        day{% if first_upcoming_event.days_until_start != 1 %}s{% endif %} on
+        <span class="text-info"
+          >{{ first_upcoming_event.start_datetime.strftime('%B %d, %Y') }}</span
+        >. {% endif %} {% endif %}
+      </p>
+      <div class="hero-buttons"></div>
     </div>
+  </div>
 </section>
 
 <section class="event-view bg-dark">
-    <div class="container">
-        <div class="event-view-content">
-            <h2 class="text-xxl text-center event-view-heading">Events</h2>
-            <div class="event-view-content-container">
+  <div class="container">
+    <div class="event-view-content">
+      <h2 class="text-xxl text-center event-view-heading">Events</h2>
+      <div class="event-content-container">
+        <!-- Event List -->
 
-                <!-- Event List -->
-                <div class="event-view-list">
-                    {% if events_by_date %}
-                    {% for date in sorted_dates %}
-                    <div class="event-date">{{ date.strftime('%d.%m.%y')
-                        }}</div>
-                    {% for event in events_by_date[date] %}
-                    <div class="event-item">
-                        <span class="event-name">{{ event.name }}</span>
-                        <span class="event-ongoing-duration">
-                            {% if (event.end_datetime -
-                            event.start_datetime).days >
-                            0 %}
-                            day {{ (date - event.start_datetime.date()).days +
-                            1 }}
-                            / {{ (event.end_datetime -
-                            event.start_datetime).days +
-                            1 }}
-                            {% endif %}
-                        </span>
-                        <span class="event-calendar">{{ event.feed.name
-                            }}</span>
-                        {% if event.days_until_start > 0 %}
-                        {% if event.days_until_start == 1 %}
-                        <span class="event-start">starts tomorrow</span>
-                        {% elif event.days_until_start == 0 %}
-                        <span class="event-start">starts today</span>
-                        {% else %}
-                        <span class="event-start">starts in {{
-                            event.days_until_start }} days</span>
-                        {% endif %}
-                        {% else %}
-                        {% if event.days_until_end == 0 %}
-                        <span class="event-end">ends today</span>
-                        {% elif event.days_until_end == 1 %}
-                        <span class="event-end">ends tomorrow</span>
-                        {% else %}
-                        <span class="event-end">ends in {{ event.days_until_end
-                            }} days</span>
-                        {% endif %}
-                        {% endif %}
-                        <div class="event-detail-card">
-                            <div class="event-detail-left">
-                                <h4 class="text-md">{{ event.name }}</h4>
-                                <p class="text-sm">
-                                    {% if event.description %}
-                                    {{ event.description }}
-                                    {% else %}
-                                    no description for this event
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <div class="event-detail-card-divider"></div>
-                            <div class="event-detail-right">
-                                <p class="text-sm">Location: {{ event.location
-                                    }}</p>
-                                <p class="text-sm">Time: {{
-                                    event.start_datetime.strftime('%H:%M') }} -
-                                    {{ event.end_datetime.strftime('%H:%M')
-                                    }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    {% endfor %}
-                    {% else %}
-                    <p>No events to display</p>
-                    {% endif %}
-                </div>
-
-                <!-- Sticky Filter and Form Container -->
-                <div class="sticky-container">
-                    <!-- Filter -->
-                    <div class="event-view-filter">
-                        <p class="text-md">Filter by Calendar</p>
-                        <form class="event-view-filter-form" method="POST"
-                            action="/apply_filter">
-                            <ul>
-                                {% for calendar_feed in calendar_feeds %}
-                                <li>
-
-                                    <input type="checkbox"
-                                        id="calendar_feed_{{ calendar_feed.id }}"
-                                        name="calendar_feed"
-                                        value="{{ calendar_feed.id }}"
-                                        {% if calendar_feed.id|string in
-                                        selected_calendar_feed_ids
-                                        %}checked{% endif %} />
-                                    <label class="form-check-label"
-                                        for="calendar_feed_{{ calendar_feed.id }}">{{
-                                        calendar_feed.name
-                                        }}</label>
-                                </li>
-                                {% endfor %}
-                            </ul>
-
-                            <div class="event-view-filter-btns">
-                                <button class="btn btn-primary"
-                                    type="submit">Apply Filter</button>
-                                <button class="btn" type="button"
-                                    onclick="window.location.href='/clear_filter';">Clear
-                                    Filter</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Event Form -->
-                    <div class="add-event-form">
-                        <p class="text-md">Add event</p>
-                        <form action="/add_event" method="POST">
-                            <div>
-                                <label for="event-name">Name</label>
-                                <input type="text" id="event-name" name="name"
-                                    required />
-                            </div>
-                            <div>
-                                <label for="event-start-datetime">Start</label>
-                                <input type="datetime-local"
-                                    id="event-start-datetime"
-                                    name="start_datetime" required />
-                            </div>
-                            <div>
-                                <label for="event-end-datetime">End</label>
-                                <input type="datetime-local"
-                                    id="event-end-datetime" name="end_datetime"
-                                    required />
-                            </div>
-                            <div>
-                                <label
-                                    for="event-description">Description</label>
-                                <textarea id="event-description"
-                                    name="description" rows="4"></textarea>
-                            </div>
-                            <div>
-                                <select id="calendar-id" name="calendar_feed_id"
-                                    required>
-                                    <option value>Select a Calendar</option>
-                                    {% for feed in owned_calendar_feeds %}
-                                    <option value="{{ feed.id }}">{{ feed.name
-                                        }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <button type="submit" class="btn">Add Event</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="event-view-list">
+          {% if events_by_date %} {% for date in sorted_dates %}
+          <div class="event-date">{{ date.strftime('%d.%m.%y') }}</div>
+          {% for event in events_by_date[date] %}
+          <div class="event-item">
+            <span class="event-name">{{ event.name }}</span>
+            <span class="event-ongoing-duration">
+              {% if (event.end_datetime - event.start_datetime).days > 0 %} day
+              {{ (date - event.start_datetime.date()).days + 1 }} / {{
+              (event.end_datetime - event.start_datetime).days + 1 }} {% endif
+              %}
+            </span>
+            <span class="event-calendar">{{ event.feed.name }}</span>
+            {% if event.days_until_start > 0 %} {% if event.days_until_start ==
+            1 %}
+            <span class="event-start">starts tomorrow</span>
+            {% elif event.days_until_start == 0 %}
+            <span class="event-start">starts today</span>
+            {% else %}
+            <span class="event-start"
+              >starts in {{ event.days_until_start }} days</span
+            >
+            {% endif %} {% else %} {% if event.days_until_end == 0 %}
+            <span class="event-end">ends today</span>
+            {% elif event.days_until_end == 1 %}
+            <span class="event-end">ends tomorrow</span>
+            {% else %}
+            <span class="event-end"
+              >ends in {{ event.days_until_end }} days</span
+            >
+            {% endif %} {% endif %}
+          </div>
+          {% endfor %} {% endfor %} {% else %}
+          <p>No events to display</p>
+          {% endif %}
         </div>
+
+        <!-- Sticky Filter and Form Container -->
+        <div class="sticky-container">
+          <!-- Filter -->
+          <div class="event-view-filter">
+            <p class="text-md">Filter by Calendar</p>
+            <form
+              class="event-view-filter-form"
+              method="POST"
+              action="/apply_filter"
+            >
+              <ul>
+                {% for calendar_feed in calendar_feeds %}
+                <li>
+                  <input
+                    type="checkbox"
+                    id="calendar_feed_{{ calendar_feed.id }}"
+                    name="calendar_feed"
+                    value="{{ calendar_feed.id }}"
+                    {%
+                    if
+                    calendar_feed.id|string
+                    in
+                    selected_calendar_feed_ids
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <label
+                    class="form-check-label"
+                    for="calendar_feed_{{ calendar_feed.id }}"
+                    >{{ calendar_feed.name }}</label
+                  >
+                </li>
+                {% endfor %}
+              </ul>
+
+              <div class="event-view-filter-btns">
+                <button class="btn btn-primary" type="submit">
+                  Apply Filter
+                </button>
+                <button
+                  class="btn"
+                  type="button"
+                  onclick="window.location.href='/clear_filter';"
+                >
+                  Clear Filter
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Event Form -->
+          <div class="add-event-form">
+            <p class="text-md">Add event</p>
+            <form action="/add_event" method="POST">
+              <div>
+                <label for="event-name">Name</label>
+                <input type="text" id="event-name" name="name" required />
+              </div>
+              <div>
+                <label for="event-start-datetime">Start</label>
+                <input
+                  type="datetime-local"
+                  id="event-start-datetime"
+                  name="start_datetime"
+                  required
+                />
+              </div>
+              <div>
+                <label for="event-end-datetime">End</label>
+                <input
+                  type="datetime-local"
+                  id="event-end-datetime"
+                  name="end_datetime"
+                  required
+                />
+              </div>
+              <div>
+                <label for="event-description">Description</label>
+                <textarea
+                  id="event-description"
+                  name="description"
+                  rows="4"
+                ></textarea>
+              </div>
+              <div>
+                <select id="calendar-id" name="calendar_feed_id" required>
+                  <option value>Select a Calendar</option>
+                  {% for feed in owned_calendar_feeds %}
+                  <option value="{{ feed.id }}">{{ feed.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn">Add Event</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const startDateTimeInput = document.getElementById("event-start-datetime");
-        const endDateTimeInput = document.getElementById("event-end-datetime");
-    
-        startDateTimeInput.addEventListener("input", function() {
-            // Set end time to be one hour after the start time
-            const startTime = new Date(startDateTimeInput.value);
-            if (startTime) {
-                const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
-                endDateTimeInput.value = endTime.toISOString().slice(0, 16); // Format as datetime-local
-            }
-        });
-    
-        function validateDateTimes() {
-            const startTime = new Date(startDateTimeInput.value);
-            const endTime = new Date(endDateTimeInput.value);
-            
-            if (startTime && endTime && endTime <= startTime) {
-                endDateTimeInput.setCustomValidity("End time must be after start time.");
-            } else {
-                endDateTimeInput.setCustomValidity(""); // Clear the custom error
-            }
-        }
-    
-        // Validate on both inputs
-        startDateTimeInput.addEventListener("input", validateDateTimes);
-        endDateTimeInput.addEventListener("input", validateDateTimes);
+  document.addEventListener("DOMContentLoaded", function () {
+    const startDateTimeInput = document.getElementById("event-start-datetime");
+    const endDateTimeInput = document.getElementById("event-end-datetime");
+
+    startDateTimeInput.addEventListener("input", function () {
+      // Set end time to be one hour after the start time
+      const startTime = new Date(startDateTimeInput.value);
+      if (startTime) {
+        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
+        endDateTimeInput.value = endTime.toISOString().slice(0, 16); // Format as datetime-local
+      }
     });
-    </script>
+
+    function validateDateTimes() {
+      const startTime = new Date(startDateTimeInput.value);
+      const endTime = new Date(endDateTimeInput.value);
+
+      if (startTime && endTime && endTime <= startTime) {
+        endDateTimeInput.setCustomValidity(
+          "End time must be after start time."
+        );
+      } else {
+        endDateTimeInput.setCustomValidity(""); // Clear the custom error
+      }
+    }
+
+    // Validate on both inputs
+    startDateTimeInput.addEventListener("input", validateDateTimes);
+    endDateTimeInput.addEventListener("input", validateDateTimes);
+  });
+</script>
 
 {% endblock %}
