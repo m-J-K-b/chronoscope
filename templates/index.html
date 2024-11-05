@@ -204,4 +204,37 @@
   </div>
 </section>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const startDateTimeInput = document.getElementById("event-start-datetime");
+    const endDateTimeInput = document.getElementById("event-end-datetime");
+
+    startDateTimeInput.addEventListener("input", function () {
+      // Set end time to be one hour after the start time
+      const startTime = new Date(startDateTimeInput.value);
+      if (startTime) {
+        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 1 hour
+        endDateTimeInput.value = endTime.toISOString().slice(0, 16); // Format as datetime-local
+      }
+    });
+
+    function validateDateTimes() {
+      const startTime = new Date(startDateTimeInput.value);
+      const endTime = new Date(endDateTimeInput.value);
+
+      if (startTime && endTime && endTime <= startTime) {
+        endDateTimeInput.setCustomValidity(
+          "End time must be after start time."
+        );
+      } else {
+        endDateTimeInput.setCustomValidity(""); // Clear the custom error
+      }
+    }
+
+    // Validate on both inputs
+    startDateTimeInput.addEventListener("input", validateDateTimes);
+    endDateTimeInput.addEventListener("input", validateDateTimes);
+  });
+</script>
+
 {% endblock %}
