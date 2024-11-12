@@ -5,23 +5,23 @@ from datetime import date, datetime, time, timedelta, timezone
 from urllib.parse import urljoin, urlparse
 
 import requests
-from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from icalendar import Calendar
 
-load_dotenv()
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(16))
 
-# Configure the SQLite database
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///calendars.db"
+# Configure the SQLAlchemy database URI to use the MySQL container
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize database and migration modules
 db = SQLAlchemy(app)
-
-
 migrate = Migrate(app, db)
 
 
