@@ -10,25 +10,26 @@
   width: 70%;
 }
 
-.event-view-content {
+.event-view-heading {
   padding: 50px 0;
 }
-.event-view-content-container {
+
+.event-view-content {
   display: flex;
   gap: 2rem;
 }
 
-.event-view-list {
+.event-list {
   position: relative;
 }
 
-.event-date {
+.list-date {
   display: block;
   width: 100%;
   margin: 10px 0;
 }
 
-.event-item {
+.event {
   /* position: relative; */
   /* width: 100%; */
   display: flex;
@@ -42,13 +43,13 @@
   transition: transform 0.2s, z-index 0s; /* Apply z-index on hover instantly */
 }
 
-.event-item:hover {
+.event:hover {
   background-color: #666;
   transform: scale(1.01);
   z-index: 20; /* Bring the entire event-item above others on hover */
 }
 
-.event-item span {
+.event span {
   flex: 1; /* Allow spans to take equal space */
 }
 
@@ -61,13 +62,12 @@
 }
 
 .event-calendar,
-.event-ongoing-duration {
+.event-active-duration {
   margin-left: auto; /* Pushes the last span to the right */
   text-align: center; /* Align text to the right */
 }
 
-.event-start,
-.event-end {
+.event-countdown {
   /* Style for the last spans */
   margin-left: auto; /* Pushes the last span to the right */
   text-align: right; /* Align text to the right */

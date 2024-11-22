@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calendar Feeds</title>
+    </head>
+    <body>
+        <h1>Calendar Feeds</h1>
+        <ul>
+            {% for calendar_feed in calendar_feeds %}
+            <li>
+                <a
+                    href="{{ url_for('calendar_feed_bp.manage_calendar_feed', calendar_feed_id=calendar_feed.id) }}">
+                    {{ calendar_feed.name }}
+                </a>
+                - Number of Events: {{ calendar_feed.events | length }}
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

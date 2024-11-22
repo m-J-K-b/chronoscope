@@ -1,39 +1,11 @@
-version: '3.8'
-
 services:
   app:
-    image: "${IMAGE_NAME}"  # Reads the image name from .env file
-    container_name: event-countdown-dev
-    command: python app.py
+    image: chronoscope
+    build: .
+    container_name: app
+    command: python run.py
     ports:
       - "5000:5000"
     volumes:
       - .:/app
-    networks:
-      - flask-network
     restart: unless-stopped
-    environment:
-      - DB_HOST=db
-      - DB_USER=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-      - DB_NAME=${MYSQL_DATABASE}
-
-  db:
-    image: mysql:latest
-    container_name: mysql-db
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    volumes:
-      - flask-db:/var/lib/mysql
-    networks:
-      - flask-network
-    restart: unless-stopped
-
-networks:
-  flask-network:
-
-volumes:
-  flask-db:
