@@ -9,3 +9,5 @@ services:
     volumes:
       - .:/app
     restart: unless-stopped
+    environment:
+      - export FLASK_APP=chronoscope

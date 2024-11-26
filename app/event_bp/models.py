@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from dateutil import rrule
@@ -12,12 +12,20 @@ class Event(db.Model):
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String, nullable=True)
 
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=True)
+    start_datetime = db.Column(db.DateTime, nullable=False)
+    end_datetime = db.Column(db.DateTime, nullable=True)
 
     calendar_feed_id = db.Column(
         db.Integer, db.ForeignKey("calendar_feed.id"), nullable=False
     )
+
+    @property
+    def start_date(self) -> date:
+        return self.start_datetime.date()
+
+    @property
+    def end_date(self) -> date:
+        return self.end_datetime.date()
 
     # def __init__(self, start_datetime: datetime, end_datetime: datetime):
     #     self.start_datetime = start_datetime

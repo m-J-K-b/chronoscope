@@ -3,6 +3,7 @@ from datetime import date, datetime
 from typing import Optional
 
 import requests
+from flask import flash
 from icalendar import Calendar
 
 from app import db
@@ -10,16 +11,6 @@ from app.calendar_feed_bp.models import CalendarFeed
 from app.event_bp.models import Event
 
 logging.basicConfig(level=logging.INFO)
-
-
-def add_calendar_feed_from_url(url: str) -> bool:
-    """Add a calendar feed to the database and fetch its events."""
-    calendar_feed = CalendarFeed(url=url)
-    if process_calendar_feed(calendar_feed):
-        db.session.add(calendar_feed)
-        db.session.commit()
-        return True
-    return False
 
 
 def fetch_ics_from_url(url: str) -> Optional[str]:
@@ -61,33 +52,35 @@ def process_calendar_feed(calendar_feed: CalendarFeed) -> bool:
             try:
                 name = component.get("summary", "Untitled Event")
                 description = component.get("description", "No description provided")
-                start_date = component.get("dtstart")
-                end_date = component.get("dtend")
+                start_datetime = component.get("dtstart")
+                end_datetime = component.get("dtend")
 
-                if not start_date:
+                if not start_datetime:
                     logging.warning("Skipping event with no start date.")
                     continue
 
-                start_date = start_date.dt
-                end_date = end_date.dt if end_date else None
+                start_datetime = start_datetime.dt
+                end_datetime = end_datetime.dt if end_datetime else None
 
                 # Ensure all times are datetime objects
-                if isinstance(start_date, date) and not isinstance(
-                    start_date, datetime
+                if isinstance(start_datetime, date) and not isinstance(
+                    start_datetime, datetime
                 ):
-                    start_date = datetime.combine(start_date, datetime.min.time())
+                    start_datetime = datetime.combine(
+                        start_datetime, datetime.min.time()
+                    )
                 if (
-                    end_date
-                    and isinstance(end_date, date)
-                    and not isinstance(end_date, datetime)
+                    end_datetime
+                    and isinstance(end_datetime, date)
+                    and not isinstance(end_datetime, datetime)
                 ):
-                    end_date = datetime.combine(end_date, datetime.min.time())
+                    end_datetime = datetime.combine(end_datetime, datetime.min.time())
 
                 # Check for duplicate events
                 existing_event = Event.query.filter_by(
                     name=name,
-                    start_datetime=start_date,
-                    end_datetime=end_date,
+                    start_datetime=start_datetime,
+                    end_datetime=end_datetime,
                     calendar_feed_id=calendar_feed.id,
                 ).first()
 
@@ -95,8 +88,8 @@ def process_calendar_feed(calendar_feed: CalendarFeed) -> bool:
                     new_event = Event(
                         name=name,
                         description=description,
-                        start_datetime=start_date,
-                        end_datetime=end_date,
+                        start_datetime=start_datetime,
+                        end_datetime=end_datetime,
                         calendar_feed_id=calendar_feed.id,
                     )
                     db.session.add(new_event)
@@ -107,3 +100,15 @@ def process_calendar_feed(calendar_feed: CalendarFeed) -> bool:
 
     db.session.commit()
     return True
+
+
+def add_calendar_feed_from_url(name: str, url: str) -> bool:
+    """Add a calendar feed to the database and fetch its events."""
+    calendar_feed = CalendarFeed(name=name, url=url)
+    if CalendarFeed.query.filter_by(url=url).count():
+        flash("Warning, Calendar with this url exists!", "warning")
+    if process_calendar_feed(calendar_feed):
+        db.session.add(calendar_feed)
+        db.session.commit()
+        return True
+    return False

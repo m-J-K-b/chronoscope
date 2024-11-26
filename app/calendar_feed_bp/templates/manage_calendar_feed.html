@@ -1,34 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Calendar Feed Details</title>
-    </head>
-    <body>
-        <h1>Calendar Feed: {{ calendar_feed.name }}</h1>
-        <p>Number of Events: {{ calendar_feed.events | length }}</p>
+{% extends "base.html" %}
 
-        <ul>
-            {% for event in calendar_feed.events %}
-            <li>
-                <a
-                    href="{{ url_for('event_bp.manage_event', event_id=event.id) }}">
-                    {{ event.name }}
-                </a>
-                - Start: {{ event.start_date }}
-                {% if event.end_date %} - End: {{ event.end_date }} {% endif %}
-                -
-            </li>
-            {% endfor %}
-        </ul>
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+<h1>Calendar Feed: {{ calendar_feed.name }}</h1>
+<p>Number of Events: {{ calendar_feed.events | length }}</p>
+
+<ul>
+    {% for event in calendar_feed.events %}
+    <li>
         <a
-            href="{{ url_for('event_bp.index') }}">
-            All events
+            href="{{ url_for('event_bp.manage_event', event_id=event.id) }}">
+            {{ event.name }}
         </a>
-        <a
-            href="{{ url_for('calendar_feed_bp.index') }}">
-            All Calendar Feeds
-        </a>
-    </body>
-</html>
+        - Start: {{ event.start_date }}
+        {% if event.end_date %} - End: {{ event.end_date }} {% endif %}
+        -
+    </li>
+    {% endfor %}
+</ul>
+<a
+    href="{{ url_for('event_bp.index') }}">
+    All events
+</a>
+<a
+    href="{{ url_for('calendar_feed_bp.index') }}">
+    All Calendar Feeds
+</a>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+
+
+chronoscope.com
+    Events in countdown view, list of all events, sorted by date with information about each event
+    should include easily accessible event creation form
+chronoscope.com/calendar_feeds -> a list of all calendar feeds with general information and a link to manage

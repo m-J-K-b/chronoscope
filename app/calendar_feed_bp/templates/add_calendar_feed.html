@@ -1,43 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create or Edit Calendar Feed</title>
-    </head>
-    <body>
-        <h1>Create or Edit Calendar Feed</h1>
-        <form method="POST"
-            action="{{ url_for('calendar_feed_bp.add_calendar_feed') }}">
-            {{ form.hidden_tag() }}
+{% extends "base.html" %}
 
-            <div>
-                <label for="name">Calendar Feed Name:</label>
-                {{ form.name(size=30) }}
-                {% if form.name.errors %}
-                <ul>
-                    {% for error in form.name.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
+{% block title %}Home Page{% endblock %}
 
-            <div>
-                <label for="url">Calendar Feed URL:</label>
-                {{ form.url(size=50) }}
-                {% if form.url.errors %}
-                <ul>
-                    {% for error in form.url.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
+{% block content %}
 
-            <div>
-                {{ form.submit() }}
-            </div>
-        </form>
-    </body>
-</html>
+<h1>Create or Edit Calendar Feed</h1>
+<form method="POST"
+    action="{{ url_for('calendar_feed_bp.add_calendar_feed') }}">
+    {{ form.hidden_tag() }}
+
+    <div>
+        <label for="name">Calendar Feed Name:</label>
+        {{ form.name(size=30) }}
+        {% if form.name.errors %}
+        <ul>
+            {% for error in form.name.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        <label for="url">Calendar Feed URL:</label>
+        {{ form.url(size=50) }}
+        {% if form.url.errors %}
+        <ul>
+            {% for error in form.url.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div>
+        {{ form.submit() }}
+    </div>
+</form>
+{% endblock %}
