@@ -4,6 +4,15 @@
 
 {% block content %}
 
+<section class="hero">
+    <div class="container">
+        <h1 class="hero-title">Upcoming events</h1>
+        <p>{{ upcoming_event_information }}</p>
+        <button class="btn-primary">Manage Calendar feeds</button>
+        <button class="btn-primary">Manage Events</button>
+    </div>
+</section>
+
 <h1>Event List</h1>
 <ul>
     {% for event in events %}

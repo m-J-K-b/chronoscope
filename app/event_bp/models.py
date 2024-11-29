@@ -19,42 +19,56 @@ class Event(db.Model):
         db.Integer, db.ForeignKey("calendar_feed.id"), nullable=False
     )
 
+    def __init__(self) -> None:
+        self._dates = None
+
     @property
     def start_date(self) -> date:
         return self.start_datetime.date()
 
     @property
+    def start_date_str(self) -> date:
+        return self.start_datetime.date().strftime("%d %M %Y")
+
+    @property
     def end_date(self) -> date:
         return self.end_datetime.date()
 
-    # def __init__(self, start_datetime: datetime, end_datetime: datetime):
-    #     self.start_datetime = start_datetime
-    #     self.end_datetime = end_datetime
-    #     self._event_dates = None  # To cache the event dates
+    @property
+    def dates(self):
+        """Return the list of dates on which the event occurs."""
+        if not hasattr(self, "_event_dates") or self._dates is None:
+            # Calculate the list of dates for the event using dateutil.rrule
+            self._dates = [
+                dt.date()
+                for dt in rrule.rrule(
+                    rrule.DAILY, dtstart=self.start_date, until=self.end_date
+                )
+            ]
 
-    # @property
-    # def event_dates(self):
-    #     """Return the list of dates on which the event occurs."""
-    #     if not hasattr(self, "_event_dates") or self._event_dates is None:
-    #         # Calculate the list of dates for the event using dateutil.rrule
-    #         start_date = self.start_datetime.date()
-    #         end_date = self.end_datetime.date() if self.end_datetime else start_date
+        return self._dates
 
-    #         # Generate the dates from start_date to end_date
-    #         self._event_dates = list(
-    #             rrule.rrule(rrule.DAILY, dtstart=start_date, until=end_date)
-    #         )
+    @property
+    def start_time_str(self) -> str:
+        return self.start_datetime.strftime("%H:%M")
 
-    #     return self._event_dates
+    @property
+    def countdown(self) -> str:
+        return (self.start_date - date.today()).days
 
-    # @property
-    # def duration_days(self) -> Optional[int]:
-    #     """Calculate the total duration of the event in days."""
-    #     if self.start_datetime and self.end_datetime:
-    #         return (
-    #             self.end_datetime - self.start_datetime
-    #         ).days + 1  # Inclusive of start and end dates
-    #     return None
+    @property
+    def countdown_str(self) -> str:
+        if self.countdown < -1:
+            return f"{abs(self.countdown)} days ago"
+        if self.countdown == -1:
+            return f"yesterday"
+        if self.countdown == 0:
+            return f"today"
+        if self.countdown == 1:
+            return f"tomorrow"
+        if self.countdown > 1:
+            return f"in {self.countdown} days"
+        return str(self.countdown)
 
     # def active_duration_string(self, from_datetime: Optional[datetime] = None) -> str:
     #     """

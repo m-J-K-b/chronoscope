@@ -1,6 +1,6 @@
 services:
   app:
-    image: chronoscope
+    image: 1mjk/chronoscope:dev
     build: .
     container_name: app
     command: python run.py

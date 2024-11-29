@@ -6,27 +6,21 @@
 }
 
 :root {
-  --primary-color: #4891ff; /* Your primary color */
-  --light-color: #f4f4f6; /* Light background color */
-  --dark-color: #111; /* Dark text color */
-
-  /* Additional Colors */
-  --highlight-color: #4891ff; /* A brighter blue for highlights (similar to primary) */
-  --emphasis-color: #e63946; /* A readable red for emphasis (good contrast with light and dark colors) */
-  --info-color: #cce0ff; /* A soft blue for informational text, matching the theme */
-  --contrast-color: #333; /* Darker color for contrast (good for readability) */
+  --light-color: #fff; /* Light background color */
+  --dark-color: #000; /* Dark text color */
+  --contrast-color: #ff0000; /* Darker color for contrast (good for readability) */
 }
 
 body {
   font-family: "Poppins", sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  background-color: #fff;
+  background-color: var(--primary-color);
 }
 
 a {
   text-decoration: none;
-  color: #333;
+  color: var(--light-color);
 }
 
 ul {
@@ -37,74 +31,91 @@ img {
   max-width: 100%;
 }
 
-form input:not([type="checkbox"]):not([type="radio"]),
-form textarea,
-form select {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  transition: border-color 0.3s ease;
-  margin-bottom: 1rem;
-}
-
-/* Focus styling for inputs, textarea, and select elements */
-form input:not([type="checkbox"]):not([type="radio"]):focus,
-form textarea:focus,
-form select:focus {
-  border-color: #a7d2ff;
-  outline: none;
-}
-
-/* Checkbox and radio button styling */
-form input[type="checkbox"],
-form input[type="radio"] {
-  width: auto;
-  margin-right: 0.5rem; /* Adds space between checkbox/radio and label */
-}
-
-/* General label styling */
-form label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-/* Specific styling for labels next to checkboxes and radio buttons */
-form input[type="checkbox"] + label,
-form input[type="radio"] + label {
-  display: inline-block; /* Keep these labels inline */
-  margin-bottom: 0.5rem; /* Remove bottom margin */
-}
-
 /* base.html template specific css */
+
 /* navbar */
-.navbar .container {
+.navbar {
+  background-color: var(--dark-color); /* Dark background */
+  padding: 20px 0px;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* Flexbox Layout */
+.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.navbar .main-menu ul {
+/* Brand Section */
+.brand {
   display: flex;
+  align-items: center;
+  color: var(--light-color);
+  font-weight: bold;
 }
 
-.navbar ul li a {
-  padding: 10px 20px;
-  display: block;
-  font-weight: 600;
-  transition: 0.5s;
+.logo {
+  font-size: 50px; /* Adjust icon size */
+  margin-right: 15px; /* Space between the icon and the text */
+  color: inherit; /* Match the color of the surrounding text */
 }
 
-.navbar ul li a:hover {
-  color: var(--primary-color);
+/* Main Menu */
+.main-menu ul {
+  display: flex;
+  gap: 20px; /* Spacing between menu items */
 }
 
-.navbar ul li a i {
-  margin-right: 10px;
+.main-menu li a {
+  color: var(--light-color);
+  padding: 5px 10px;
+  transition: color 0.3s ease;
 }
-.navbar ul li:last-child a {
-  margin-left: 10px;
+
+/* Hover Effect */
+.main-menu li a:hover {
+  color: var(--contrast-color); /* Light blue on hover */
+}
+
+footer {
+  background-color: var(--dark-color);
+  color: var(--light-color);
+  padding: 20px 0;
+  text-align: center;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-text {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.footer-nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.footer-nav li {
+  display: inline;
+  margin-right: 15px;
+}
+
+.footer-nav a {
+  color: var(--light-color);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.footer-nav a:hover {
+  color: var(--contrast-color);
 }
 
 /* Utility classes */
@@ -136,8 +147,8 @@ form input[type="radio"] + label {
 .btn {
   display: inline-block;
   padding: 13px 20px;
-  background: var(--light-color);
-  color: #333;
+  background: var(--dark-color);
+  color: var(--light-color);
   font-weight: 600;
   text-decoration: none; /* Ensures no underline on <a> */
   border: none;
@@ -148,17 +159,12 @@ form input[type="radio"] + label {
 }
 
 .btn:hover {
-  opacity: 0.8;
+  background-color: var(--contrast-color);
 }
 
-.btn-primary {
-  background-color: var(--primary-color);
-  color: #fff;
-}
-
-.btn-dark {
-  background-color: var(--dark-color);
-  color: #fff;
+.btn-light {
+  background-color: var(--light-color);
+  color: var(--light-color);
 }
 
 .btn-block {
@@ -204,37 +210,4 @@ form input[type="radio"] + label {
 
 .text-center {
   text-align: center;
-}
-
-.text-highlight {
-  font-weight: bold; /* Makes the text bold */
-  color: var(--highlight-color); /* Bright color for highlights */
-}
-
-.text-emphasis {
-  font-style: italic; /* Italicizes the text for emphasis */
-  color: var(--emphasis-color); /* Color for emphasis */
-}
-
-.text-info {
-  background-color: var(--info-color); /* Light background for info */
-  padding: 0 0.2em; /* Slight padding */
-  border-radius: 4px; /* Rounded corners */
-  color: var(--dark-color); /* Ensure text is readable */
-}
-
-.text-contrast {
-  color: var(--contrast-color); /* For darker text */
-}
-
-/* backgroundcolor classes */
-
-.bg-dark {
-  background-color: var(--dark-color);
-  color: white;
-}
-
-.bg-black {
-  background-color: #000;
-  color: var(--light-color);
 }

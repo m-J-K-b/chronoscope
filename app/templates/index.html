@@ -1,10 +1,145 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-<h1>Welcome to the Home Page</h1>
-<a href="{{ url_for('calendar_feed_bp.index') }}">manage
-    calendar feeds</a>
-<a href="{{ url_for('event_bp.index') }}">manage events</a>
+<section class="hero">
+    <div class="container">
+        <h1 class="hero-heading text-xxl">Upcoming Events</h1>
+        <p class="hero-text text-md">{{ upcoming_event_info_str }}</p>
+
+        <div class="btns">
+
+            <button class="btn">
+                <a href="{{ url_for('calendar_feed_bp.index') }}">calendar
+                    feeds</a>
+            </button>
+            <button class="btn">
+                <a href="{{ url_for('event_bp.index') }}">events</a>
+            </button>
+        </div>
+    </div>
+</section>
+<section class="event-list">
+    <div class="container">
+        <h2 class="text-xl">Events</h2>
+    </div>
+    <div class="wrapper" id="event-wrapper">
+        <div class="container">
+            <div class="util">
+                <button id="scrollToCurrentDate" class="btn">Back to Current
+                    Date</button>
+            </div>
+
+            {% for date in sorted_dates %}
+            <div class="date" id="date-{{ loop.index }}">
+                <p class="text-lg">{{ date.strftime('%d.%m.%Y') }}</p>
+                {% for event in events_sorted_by_date[date] %}
+                <div class="event">
+                    <div class="event-preview">
+                        <button class="expand-arrow" aria-expanded="false"
+                            aria-label="Expand event">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <span class="text-md event-name">{{ event.name }}</span>
+                        <span class="text-md event-start">{{
+                            event.start_time_str
+                            }}</span>
+                        <span class="text-md event-countdown">{{
+                            event.countdown_str
+                            }}</span>
+                    </div>
+                    <div class="event-details">
+                        <p class="event-full-name">{{ event.name }}</p>
+                        <p class="event-description">{{ event.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    <!-- Event Expansion -->
+    document.addEventListener('DOMContentLoaded', function () {
+        var currentDateIndex = {{ current_date_index }};
+        var wrapper = document.getElementById('event-wrapper'); // Get the wrapper element
+        var scrollButton = document.getElementById('scrollToCurrentDate'); // Get the button element
+        const dates = document.querySelectorAll('.date');
+        const expandButtons = document.querySelectorAll('.expand-arrow');
+
+        dates.forEach((date, index) => {
+            if (currentDateIndex !== null && index < currentDateIndex) {
+                date.classList.add('completed');
+            } else {
+                date.classList.remove('completed'); // Ensure uncompleted dates stay unmarked
+            }
+        });
+
+        if (currentDateIndex !== null) {
+            var targetDateElement = document.getElementById('date-' + (currentDateIndex + 1));
+            if (targetDateElement) {
+                var offsetTop = targetDateElement.offsetTop;
+                wrapper.scrollTo({
+                    top: offsetTop - wrapper.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Add event listener for the button to scroll to current date when clicked
+        scrollButton.addEventListener('click', function () {
+            if (currentDateIndex !== null) {
+                var targetDateElement = document.getElementById('date-' + (currentDateIndex + 1));
+                if (targetDateElement) {
+                    var offsetTop = targetDateElement.offsetTop;
+                    wrapper.scrollTo({
+                        top: offsetTop - wrapper.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+
+        expandButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const isExpanded = button.getAttribute('aria-expanded') === 'true';
+                const eventWrapper = button.closest('.event');
+                const details = eventWrapper.querySelector('.event-details');
+    
+                // Collapse all other expanded events
+                document.querySelectorAll('.event-details.expanded').forEach(expandedDetails => {
+                    if (expandedDetails !== details) {
+                        expandedDetails.style.maxHeight = '0';
+                        expandedDetails.style.padding = '0 10px';
+                        expandedDetails.classList.remove('expanded');
+                        expandedDetails.previousElementSibling
+                            .querySelector('.expand-arrow')
+                            .setAttribute('aria-expanded', 'false');
+                    }
+                });
+    
+                // Toggle the clicked event
+                if (!isExpanded) {
+                    details.classList.add('expanded');
+                    details.style.maxHeight = details.scrollHeight*1.4 + 'px';
+                    details.style.padding = '10px';
+                    button.setAttribute('aria-expanded', 'true');
+                } else {
+                    details.classList.remove('expanded');
+                    details.style.maxHeight = '0';
+                    details.style.padding = '0 10px';
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+    });
+</script>
 {% endblock %}
