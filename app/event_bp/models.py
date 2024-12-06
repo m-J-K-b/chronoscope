@@ -19,7 +19,8 @@ class Event(db.Model):
         db.Integer, db.ForeignKey("calendar_feed.id"), nullable=False
     )
 
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._dates = None
 
     @property

@@ -10,8 +10,6 @@ from app import db
 from app.calendar_feed_bp.models import CalendarFeed
 from app.event_bp.models import Event
 
-logging.basicConfig(level=logging.INFO)
-
 
 def fetch_ics_from_url(url: str) -> Optional[str]:
     """Fetch the ICS file from the given URL."""

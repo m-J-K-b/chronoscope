@@ -30,6 +30,14 @@ def add_calendar_feed():
     return render_template("add_calendar_feed.html", form=form)
 
 
+@calendar_feed_bp.route(
+    "/delete_calendar_feed/<int:calendar_feed_id>", methods=["POST"]
+)
+def delete_calendar_feed(calendar_feed_id):
+    CalendarFeed.query.get(calendar_feed_id).delete()
+    db.session.commit()
+
+
 @calendar_feed_bp.route("/manage_calendar_feed/<int:calendar_feed_id>", methods=["GET"])
 def manage_calendar_feed(calendar_feed_id):
     calendar_feed = CalendarFeed.query.get(calendar_feed_id)

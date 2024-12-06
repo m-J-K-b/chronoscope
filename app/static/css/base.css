@@ -33,6 +33,25 @@ img {
 
 /* base.html template specific css */
 
+
+/* flash messages */
+.flash-success {
+  color: green;
+}
+.flash-error {
+  color: red;
+}
+.flash-info {
+  color: blue;
+}
+.flash-messages ul {
+  list-style-type: none;
+  padding: 0;
+}
+.flash-messages li {
+  margin: 5px 0;
+}
+
 /* navbar */
 .navbar {
   background-color: var(--dark-color); /* Dark background */
@@ -79,7 +98,7 @@ img {
   color: var(--contrast-color); /* Light blue on hover */
 }
 
-footer {
+.footer {
   background-color: var(--dark-color);
   color: var(--light-color);
   padding: 20px 0;

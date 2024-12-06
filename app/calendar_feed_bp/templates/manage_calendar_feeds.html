@@ -1,20 +1,13 @@
 {% extends "base.html" %}
-
 {% block title %}Home Page{% endblock %}
-
 {% block content %}
+<section class="calendar_feed_list">
+  {% for calendar_feed in calendar_feeds %}
+  <div class="calendar_feed">
 
-<h1>Calendar Feeds</h1>
-<ul>
-    {% for calendar_feed in calendar_feeds %}
-    <li>
-        <a
-            href="{{ url_for('calendar_feed_bp.manage_calendar_feed', calendar_feed_id=calendar_feed.id) }}">
-            {{ calendar_feed.name }}
-        </a>
-        - Number of Events: {{ calendar_feed.events | length }}
-    </li>
-    {% endfor %}
-</ul>
-
+    <span class="calendar_feed_name">{{calendar_feed.name}}</span>
+    <span class="calendar_feed_event_count">{{ calendar_feed.events|length }}</span>
+  </div>
+  {% endfor %}
+</section>
 {% endblock %}
