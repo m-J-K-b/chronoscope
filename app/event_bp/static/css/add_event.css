@@ -1,0 +1,36 @@
+/* Form Section */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Form Inputs */
+input[type='text'],
+input[type='date'],
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    resize: none;
+    transition: border-color 0.3s;
+}
+
+textarea {
+    overflow: hidden;
+    min-height: 80px;
+}
+
+input[type='text']:focus,
+input[type='date']:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--contrast-color);
+    outline: none;
+    background-color: var(--light-color);
+}

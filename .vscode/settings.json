@@ -10,6 +10,6 @@
   },
   "isort.args": ["--profile", "black"],
   "[html]": {
-    "editor.defaultFormatter": null
+    "editor.defaultFormatter": "mohd-akram.vscode-html-format"
   }
 }
